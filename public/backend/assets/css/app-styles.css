@@ -1,0 +1,268 @@
+.fallback-font {
+    font-family: Arial, sans-serif !important;
+}
+
+@font-face {
+    font-family: 'Acto Book Fallback';
+    src: local('Arial'), local('sans-serif');
+    unicode-range: U+28, U+29;
+}
+
+body {
+    font-family: 'Acto Book Fallback', 'Acto Book', sans-serif;
+}
+
+.bg-dark-red {
+    background-color: #b83e5a;
+    /* Un ejemplo de rojo oscuro, ajusta según necesites */
+}
+
+.sidebar-dark-red {
+    background-color: #b83e5a;
+    /* Ajusta el rojo oscuro a tu gusto */
+}
+
+/* Estilos para el contenedor del buscador */
+.form-inline.my-2 {
+    background-color: #cd4843 !important;
+    /* Un rojo profesional */
+    border-radius: 0.25rem !important;
+    /* Bordes redondeados para suavizar el aspecto */
+}
+
+/* Estilos para el campo de entrada */
+.form-control-sidebar {
+    border: 0 !important;
+    /* Elimina el borde para un look más limpio */
+    color: #ffffff !important;
+    /* Texto blanco para contraste */
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    /* Un ligero toque de transparencia para el fondo */
+}
+
+.form-control-sidebar::placeholder {
+    /* Estilo para el texto del placeholder */
+    color: #ffffff !important;
+    /* Asegura que el placeholder sea visible */
+    opacity: 1 !important;
+    /* Asegura que el color del placeholder no sea transparente */
+}
+
+/* Estilos para el botón de búsqueda */
+.btn-sidebar {
+    color: #ffffff !important;
+    /* Icono de búsqueda en blanco */
+    background-color: #9a120d !important;
+    /* Un tono ligeramente más oscuro para el botón */
+    border: 0 !important;
+    /* Elimina el borde para un look más integrado */
+}
+
+.btn-sidebar:hover {
+    background-color: #ac2925 !important;
+    /* Un rojo aún más oscuro para el hover */
+}
+
+/* Estilo opcional para el icono de búsqueda */
+.fas.fa-fw.fa-search {
+    color: #ffffff !important;
+    /* Asegura que el icono de búsqueda sea blanco */
+}
+
+.brand-custom {
+    width: 250px;
+    /* Ajusta el ancho según sea necesario */
+    max-height: 50px;
+    /* Ajusta la altura máxima según sea necesario */
+    border-radius: 5px;
+    /* Borde redondeado */
+    margin: 2px auto;
+    /* Centra la imagen horizontalmente */
+    display: block;
+    /* Asegura que la imagen se muestre como un bloque */
+}
+
+/* Select2 Dark Mode */
+.dark-mode .select2-container--bootstrap4 .select2-selection--single,
+.dark-mode .select2-container--bootstrap4 .select2-selection--multiple {
+    background-color: #343a40;
+    color: #fff;
+    border: 1px solid #6c757d;
+}
+
+.dark-mode .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered,
+.dark-mode .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+    color: #fff;
+}
+
+.dark-mode .select2-container--bootstrap4 .select2-dropdown {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.dark-mode .select2-container--bootstrap4 .select2-results__option--highlighted {
+    background-color: #495057;
+}
+
+/* CKEditor Dark Mode */
+.dark-mode .ck-editor__editable_inline {
+    background-color: #343a40;
+    color: #fff;
+    border: 1px solid #6c757d;
+}
+
+.dark-mode .ck.ck-toolbar {
+    background-color: #343a40;
+    border: 1px solid #6c757d;
+}
+
+.dark-mode .ck.ck-button.ck-on,
+.dark-mode .ck.ck-button:hover {
+    background-color: #495057;
+}
+
+.dark-mode .ck.ck-content {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel,
+.dark-mode .ck.ck-list__item {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-button__label {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-list__item .ck.ck-button__label {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown .ck.ck-dropdown__button {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown .ck.ck-dropdown__panel {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-balloon-panel,
+.dark-mode .ck.ck-tooltip {
+    background-color: #495057 !important;
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-toolbar__separator {
+    border-color: #6c757d !important;
+}
+
+.dark-mode .ck.ck-color-grid__tile {
+    border-color: #6c757d !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-list .ck-button__label {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-list .ck-button:hover {
+    background-color: #495057 !important;
+}
+
+.dark-mode .ck.ck-balloon-panel .ck-button:hover,
+.dark-mode .ck.ck-balloon-panel .ck-button.ck-on {
+    background-color: #495057 !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-button__label {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-button:hover {
+    background-color: #495057 !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-button.ck-on {
+    background-color: #495057 !important;
+    border-color: #6c757d !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-color-table__palette-button {
+    border-color: #6c757d !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-color-table__palette-button:hover {
+    border-color: #6c757d !important;
+    background-color: #495057 !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-color-table .ck-color-table__palette-button.ck-on {
+    border-color: #6c757d !important;
+    background-color: #495057 !important;
+}
+
+/* Additional Styles */
+.dark-mode .ck.ck-dropdown__panel {
+    background-color: #343a40 !important;
+}
+
+.dark-mode .ck.ck-dropdown__button .ck-dropdown__arrow {
+    border-top-color: #fff !important;
+}
+
+.dark-mode .ck.ck-toolbar__items .ck-button__label {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-toolbar__items .ck.ck-button {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-toolbar__items .ck.ck-dropdown__button {
+    color: #fff !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-list {
+    background-color: #343a40 !important;
+}
+
+.dark-mode .ck.ck-dropdown__panel .ck-list .ck-list__item {
+    color: #fff !important;
+}
+
+#search_dependencia {
+    margin-top: 0px !important;
+}
+
+.btn-custom {
+    background-color: #b83e5a;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #a6334e; /* O cualquier color deseado para el hover */
+    color: white;
+}
+
+.bg-custom {
+    background-color: #b83e5a;
+    color: white;
+}
+
+.bg-custom:hover {
+    background-color: #a6334e; /* O cualquier color deseado para el hover */
+    color: white;
+}
+
+/* Estilo para pantallas pequeñas */
+@media (max-width: 767.98px) {
+    .custom-width {
+        width: 100% !important;
+        margin-right: 0 !important;
+        margin-bottom: 15px;
+        /* Espacio entre los elementos */
+    }
+}

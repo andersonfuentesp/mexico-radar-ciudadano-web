@@ -1,0 +1,13 @@
+#datatable-2 tbody th,
+#datatable-2 tbody td {
+    padding: 2px 2px;
+}
+
+#datatable tbody th,
+#datatable tbody td {
+    padding: 2px 2px;
+}
+
+#datatable-2 tbody>tr>td {
+    white-space: nowrap;
+}

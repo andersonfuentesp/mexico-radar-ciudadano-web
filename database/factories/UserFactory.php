@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -18,10 +19,15 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->firstName(), // Usar firstName() para generar nombres
+            'lastname' => $this->faker->lastName(), // Generar apellidos
+            'username' => $this->faker->unique()->userName(),
+            'image' => 'https://picsum.photos/640/480?random=' . $this->faker->unique()->numberBetween(1, 1000),
+            'email' => $this->faker->unique()->safeEmail(),
+            'date_register' => $this->faker->date(), // Generar una fecha aleatoria
+            'last_connection' => $this->faker->dateTimeThisMonth()->format('Y-m-d H:i:s'), // Generar una fecha y hora aleatorias de este mes
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => Hash::make('12345'), // Contraseña hasheada
             'remember_token' => Str::random(10),
         ];
     }

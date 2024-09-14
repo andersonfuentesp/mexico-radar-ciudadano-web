@@ -1,0 +1,101 @@
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: .5rem .75rem;
+    margin-left: .5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: .3rem;
+    border: 2px solid #e2e8f0;
+    /* borde consistente */
+    background-color: #fff;
+    color: #4a5568;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e2e8f0;
+    border-color: #cbd5e0;
+    /* color de borde modificado en lugar del grosor */
+    color: #2d3748;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #4a5568;
+    color: #fff;
+    border-color: #4a5568;
+    /* color de borde modificado en lugar del grosor */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Las siguientes clases ya existen en TailwindCSS. Si estás usando Tailwind, realmente no necesitas redefinirlas. Sin embargo, si decides no usar Tailwind o deseas definirlas de forma independiente, aquí están: */
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.myTableDatatable th {
+    background-color: black;
+    color: white;
+}
+
+.bg-red-500 {
+    background-color: #EF4444;
+}
+
+.bg-yellow-500 {
+    background-color: #ebc20c;
+}
+
+#botoncentrado {
+    text-align: center;
+    vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+    .flex-wrap {
+        flex-direction: column;
+    }
+}
+
+/* Estilos uniformes para todos los botones de DataTables y botón personalizado */
+/* Estilos uniformes para todos los botones */
+.dt-buttons .custom-button,
+.dt-buttons .custom-button:hover {
+    background-color: #2563eb !important; /* Color de fondo azul */
+    color: white !important; /* Color de texto blanco */
+    padding: 6px 12px !important; /* Padding uniforme para todos */
+    border-radius: 4px !important; /* Bordes redondeados */
+    border: none !important; /* Sin borde */
+    cursor: pointer !important; /* Cursor tipo puntero */
+    margin-right: 5px !important; /* Margen a la derecha */
+    margin-bottom: 10px !important; /* Margen inferior */
+    font-size: 14px !important; /* Tamaño de fuente estándar */
+    line-height: 1.5 !important; /* Altura de línea para centrado vertical */
+    display: inline-block !important; /* Para mantener el flujo en línea */
+    vertical-align: middle !important; /* Alineación vertical */
+    text-align: center; /* Alineación del texto */
+    box-shadow: none !important; /* Sin sombra de caja */
+    outline: none !important; /* Sin contorno al enfocar */
+}
+
+.custom-shadow:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.pointer-events-none{
+    pointer-events: none;
+}
+
+.font-bold{
+    font-weight: 700;
+    color: #000;
+}
