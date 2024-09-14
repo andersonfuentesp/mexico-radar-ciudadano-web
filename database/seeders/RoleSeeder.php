@@ -30,6 +30,18 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.password.change', 'description' => 'Ver la vista para cambiar la contraseña - Administrativos'])
             ->syncRoles([$role1]);
 
+        //Municipios contratados
+        Permission::create(['name' => 'admin.contractedMunicipality.all', 'description' => 'Gestionar municipios contratados'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.add', 'description' => 'Agregar municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.detail', 'description' => 'Ver datos de municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.edit', 'description' => 'Editar datos municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.delete', 'description' => 'Eliminar municipio contratado'])
+            ->syncRoles([$role1]);
+
         //Usuarios
         Permission::create(['name' => 'admin.user.all', 'description' => 'Gestionar usuarios - Administrativos'])
             ->syncRoles([$role1]);

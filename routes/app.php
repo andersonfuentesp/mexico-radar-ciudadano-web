@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommonController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\Admin\ContractedMunicipalityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DefaultController;
+use App\Http\Controllers\UtilitieController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,10 @@ Route::get('/maps-api-proxy-geocodification-coordinates', [DefaultController::cl
 Route::post('/maps-api-proxy-geocodification-postal-code-neighborhood', [DefaultController::class, 'getColoniaYCodigoPostal'])->name('maps.proxy.geocodificacion.postal-code-neighborhood');
 
 /************* Admin ***************/
+Route::controller(UtilitieController::class)->group(function () {
+    Route::get('utilitie/municipios/{estadoId}', 'getMunicipiosByEstado')->name('admin.utilitie.getMunicipiosByEstado');
+});
+
 Route::controller(CommonController::class)->group(function () {
     Route::get('', 'index')->name('admin.index');
     Route::post('/chart', 'chart')->name('admin.chart');
@@ -35,6 +41,17 @@ Route::controller(CommonController::class)->group(function () {
 
     Route::get('seguridad', 'passwordChange')->name('admin.password.change');
     Route::post('password/update', 'passwordUpdate')->name('admin.password.update');
+});
+
+/************* Admin: Contracted Municipalities ***************/
+Route::controller(ContractedMunicipalityController::class)->group(function () {
+    Route::get('municipios-contratados', 'index')->name('admin.contractedMunicipality.all');
+    Route::get('municipios-contratados/agregar', 'create')->name('admin.contractedMunicipality.add');
+    Route::post('municipios-contratados/store', 'store')->name('admin.contractedMunicipality.store');
+    Route::get('municipios-contratados/detalle/{id}', 'detail')->name('admin.contractedMunicipality.detail');
+    Route::get('municipios-contratados/editar/{id}', 'edit')->name('admin.contractedMunicipality.edit');
+    Route::post('municipios-contratados/update/{id}', 'update')->name('admin.contractedMunicipality.update');
+    Route::get('municipios-contratados/delete/{id}', 'destroy')->name('admin.contractedMunicipality.delete');
 });
 
 Route::controller(UserController::class)->group(function () {

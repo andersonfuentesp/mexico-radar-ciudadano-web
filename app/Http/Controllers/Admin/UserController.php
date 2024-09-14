@@ -87,7 +87,7 @@ class UserController extends Controller
             'message' => 'Se registró con éxito al usuario',
             'alert-type' => 'success'
         ];
-        return redirect()->route('user.all')->with($notification);
+        return redirect()->route('admin.user.all')->with($notification);
     }
 
     public function userEdit($id)
@@ -123,7 +123,7 @@ class UserController extends Controller
             'alert-type' => 'success'
         ];
 
-        return redirect()->route('user.all')->with($notification);
+        return redirect()->route('admin.user.all')->with($notification);
     }
 
     public function userDelete($id)

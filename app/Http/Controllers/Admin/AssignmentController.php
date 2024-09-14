@@ -11,8 +11,8 @@ class AssignmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:assignment.all')->only('assignmentAll');
-        $this->middleware('can:assignment.edit')->only('assignmentEdit', 'assignmentUpdate');
+        $this->middleware('can:admin.assignment.all')->only('assignmentAll');
+        $this->middleware('can:admin.assignment.edit')->only('assignmentEdit', 'assignmentUpdate');
     }
 
     public function assignmentAll()

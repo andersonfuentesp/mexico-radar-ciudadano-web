@@ -2,7 +2,20 @@
 @section('title', 'Editar rol y sus permisos')
 
 @section('content_header')
-    <h1>Editar rol</h1>
+    <div class="card container-fluid mb-0">
+        <div class="row mb-1 mt-3">
+            <div class="col-sm-12">
+                <div class="p-3 mb-2 bg-light rounded">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.role.all') }}">Gestión de Roles</a></li>
+                        <li class="breadcrumb-item active">Editar rol</li>
+                    </ol>
+                    <h1 class="m-0" style="font-size: 23px;"><b>Editar Rol</b></h1>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('content')
@@ -12,7 +25,7 @@
             <h1 class="card-title">Edición de rol</h1>
         </div>
 
-        <form class="form-horizontal" method="POST" action="{{ route('role.update', $role->id) }}">
+        <form class="form-horizontal" method="POST" action="{{ route('admin.role.update', $role->id) }}">
 
             @csrf
 
@@ -44,7 +57,7 @@
             <div class="card-footer">
                 <input type="submit" class="btn btn-info btn-rounded waves-effect waves-light"
                     value="Actualizar rol" />
-                <a href="{{ route('role.all') }}" class="btn btn-default">Regresar</a>
+                <a href="{{ route('admin.role.all') }}" class="btn btn-default">Regresar</a>
             </div>
 
         </form>

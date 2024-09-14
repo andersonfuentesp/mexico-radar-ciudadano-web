@@ -342,6 +342,29 @@ return [
             'icon' => 'fas fa-fw fa-lock',
             'can' => 'admin.password.change'
         ],
+
+        ['header' => 'Opciones del sistema', 'can' => ['admin.contractedMunicipality.all']],
+        [
+            'text'    => 'Contratados',
+            'can'     => ['admin.contractedMunicipality.all'],
+            'icon'    => 'fas fa-fw fa-city', // Cambiado a un icono relacionado con "city"
+            'submenu' => [
+                [
+                    'text'   => 'Municipios contratados',
+                    'route'  => 'admin.contractedMunicipality.all',
+                    'active' => ['app/municipios-contratados', 'app/municipios-contratados/edit*'],
+                    'can'    => 'admin.contractedMunicipality.all',
+                    'icon'   => 'fas fa-map-marked-alt', // Icono para ubicaciones
+                ],
+                [
+                    'text'   => 'Registrar contrato',
+                    'route'  => 'admin.contractedMunicipality.add',
+                    'active' => ['app/municipios-contratados/agregar'],
+                    'can'    => 'admin.contractedMunicipality.add',
+                    'icon'   => 'fas fa-file-signature', // Icono para firmar contratos
+                ],
+            ],
+        ],
         
         ['header' => 'Mantenimiento del sistema', 'can' => ['admin.user.all']],
         [
@@ -476,6 +499,21 @@ return [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdn.jsdelivr.net/npm/sweetalert2@10',
+                ],
+            ],
+        ],
+        'Toastr' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/toastr/toastr.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/toastr/toastr.min.js',
                 ],
             ],
         ],

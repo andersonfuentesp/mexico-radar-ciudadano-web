@@ -2,7 +2,19 @@
 @section('title', 'Todos los roles')
 
 @section('content_header')
-    <h1>Lista de roles</h1>
+    <div class="card container-fluid mb-0">
+        <div class="row mb-1 mt-3">
+            <div class="col-sm-12">
+                <div class="p-3 mb-2 bg-light rounded">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">Inicio</a></li>
+                        <li class="breadcrumb-item active">Gestión de Roles</li>
+                    </ol>
+                    <h1 class="m-0" style="font-size: 23px;"><b>Gestión de Roles</b></h1>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('csscode')
@@ -13,8 +25,8 @@
 
     <div class="card">
         <div class="card-header">
-            @can('role.add')
-                <a href="{{ route('role.add') }}" class="btn btn-info btn-rounded 
+            @can('admin.role.add')
+                <a href="{{ route('admin.role.add') }}" class="btn btn-info btn-rounded 
                 waves-effect waves-light">Registrar
                     nuevo rol</a>
             @endcan
@@ -38,13 +50,13 @@
                             <td>{{ $item->name }}</td>
                             <td>{{ $item->permissions_count }}</td>
                             <td>
-                                @can('role.edit')
-                                    <a href="{{ route('role.edit', $item->id) }}" class="btn btn-info sm" title="Edit data">
+                                @can('admin.role.edit')
+                                    <a href="{{ route('admin.role.edit', $item->id) }}" class="btn btn-info sm" title="Edit data">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 @endcan
-                                @can('role.delete')
-                                    <a href="{{ route('role.delete', $item->id) }}" id="delete" class="btn btn-danger sm"
+                                @can('admin.role.delete')
+                                    <a href="{{ route('admin.role.delete', $item->id) }}" id="delete" class="btn btn-danger sm"
                                         title="Delete data">
                                         <i class="fas fa-trash"></i>
                                     </a>

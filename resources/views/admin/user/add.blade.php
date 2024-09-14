@@ -2,8 +2,22 @@
 @section('title', 'Registrar usuario')
 
 @section('content_header')
-    <h1>Crear usuario</h1>
+    <div class="card container-fluid mb-0">
+        <div class="row mb-1 mt-3">
+            <div class="col-sm-12">
+                <div class="p-3 mb-2 bg-light rounded">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.user.all') }}">Gestión de Usuarios</a></li>
+                        <li class="breadcrumb-item active"><a>Editar usuario</a></li>
+                    </ol>
+                    <h1 class="m-0" style="font-size: 23px;"><b>Gestión de Usuarios</b></h1>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
+
 
 @section('content')
 
@@ -12,7 +26,7 @@
             <h1 class="card-title">Registro de nuevo usuario</h1>
         </div>
 
-        <form class="form-horizontal" id="quickForm" method="POST" action="{{ route('user.store') }}"
+        <form class="form-horizontal" id="quickForm" method="POST" action="{{ route('admin.user.store') }}"
             enctype="multipart/form-data">
 
             @csrf
@@ -74,12 +88,12 @@
                             placeholder="Ingrese la contraseña">
                     </div>
                     <div class="col-3">
-                        <button class="form-control btn btn-primary" id="generate" type="button">Generar
-                            contraseña</button>
+                        <button class="form-control btn btn-primary" id="generate" type="button">
+                            <i class="bi bi-shield-lock"></i>&nbsp;Generar contraseña</button>
                     </div>
                     <div class="col-3">
                         <button class="form-control btn btn-secondary" id="show-password" type="button">
-                            <i class="bi bi-eye"></i> Mostrar contraseña</button>
+                            <i class="bi bi-eye"></i>&nbsp;Mostrar contraseña</button>
                     </div>
                     @error('password')
                         <span class="text-danger">{{ $message }}</span>
@@ -127,7 +141,7 @@
             <div class="card-footer">
                 <button type="submit" class="btn btn-info btn-rounded waves-effect waves-light">
                     <i class="bi bi-floppy"></i>&nbsp;&nbsp;Registrar usuario</button>
-                <a href="{{ route('user.all') }}" class="btn btn-default"><i class="bi bi-arrow-left-circle"></i> Regresar</a>
+                <a href="{{ route('admin.user.all') }}" class="btn btn-default"><i class="bi bi-arrow-left-circle"></i> Regresar</a>
             </div>
 
         </form>
@@ -159,18 +173,17 @@
                 reader.onload = function(e) {
                     $('#showImage').attr('src', e.target.result);
                 }
-                reader.readAsDataURL(e.target.files['0']);
+                reader.readAsDataURL(e.target.files[0]);
             });
         });
 
         $("#rol_id").change(function() {
             if (this.value == "2") {
-
+                // Your logic here if needed
             }
         });
 
         $("#generate").click(function() {
-
             var pass = random_password();
             var x = Math.floor((Math.random() * 100) + 1);
             $("#password").val(pass + "#" + x + "Tf");
