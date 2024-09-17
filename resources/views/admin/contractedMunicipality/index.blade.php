@@ -21,7 +21,7 @@
     <div class="card">
         <div class="card-header">
             <a href="{{ route('admin.contractedMunicipality.add') }}"
-                class="btn btn-info btn-rounded waves-effect waves-light">
+                class="btn btn-custom btn-rounded waves-effect waves-light">
                 <i class="fas fa-plus"></i> Registrar Nuevo Municipio Contratado
             </a>
         </div>
@@ -100,6 +100,14 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                @endcan
+
+                                <!-- Botón de servicios -->
+                                @can('admin.contractedMunicipality.services')
+                                    <a href="{{ route('admin.contractedMunicipality.services', encrypt($municipality->id)) }}"
+                                        class="btn btn-warning" title="Servicios">
+                                        <i class="fas fa-tools"></i>
+                                    </a>
                                 @endcan
                             </td>
                         </tr>

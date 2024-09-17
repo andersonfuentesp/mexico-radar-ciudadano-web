@@ -30,6 +30,40 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.password.change', 'description' => 'Ver la vista para cambiar la contraseña - Administrativos'])
             ->syncRoles([$role1]);
 
+        //Catálogo - Tipo de reporte
+        Permission::create(['name' => 'admin.catalog.reports.type', 'description' => 'Ver lista tipo de reportes - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.reports.type.add', 'description' => 'Agregar tipo de reporte - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.reports.type.edit', 'description' => 'Editar tipo de reporte - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.reports.type.detail', 'description' => 'Ver detalle de tipo de reporte - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.reports.type.delete', 'description' => 'Eliminar tipo de reporte - Catálogo'])
+            ->syncRoles([$role1]);
+
+        //Catálogo - Estados
+        Permission::create(['name' => 'admin.catalog.states', 'description' => 'Ver lista de estados - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.state.detail', 'description' => 'Ver detalle de estado - Catálogo'])
+            ->syncRoles([$role1]);
+
+        //Catálogo - Municipios
+        Permission::create(['name' => 'admin.catalog.municipalities', 'description' => 'Ver lista de municipios - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.municipality.detail', 'description' => 'Ver detalle de municipio - Catálogo'])
+            ->syncRoles([$role1]);
+
+        //Catálogo - Colonias
+        Permission::create(['name' => 'admin.catalog.neighborhoods', 'description' => 'Ver lista de colonias - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.neighborhood.add', 'description' => 'Agregar colonia - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.neighborhood.edit', 'description' => 'Editar datos de colonia - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.neighborhood.delete', 'description' => 'Eliminar colonia - Catálogo'])
+            ->syncRoles([$role1]);
+
         //Municipios contratados
         Permission::create(['name' => 'admin.contractedMunicipality.all', 'description' => 'Gestionar municipios contratados'])
             ->syncRoles([$role1]);
@@ -40,6 +74,8 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.contractedMunicipality.edit', 'description' => 'Editar datos municipio contratado'])
             ->syncRoles([$role1]);
         Permission::create(['name' => 'admin.contractedMunicipality.delete', 'description' => 'Eliminar municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.services', 'description' => 'Servicios del municipio contratado'])
             ->syncRoles([$role1]);
 
         //Usuarios

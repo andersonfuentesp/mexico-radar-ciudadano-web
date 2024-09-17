@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommonController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\AssignmentController;
-use App\Http\Controllers\Admin\ContractedMunicipalityController;
+use App\Http\Controllers\Catalogo\CatalogoEstadoController;
+use App\Http\Controllers\Catalogo\CatalogoMunicipioController;
+use App\Http\Controllers\Catalogo\CatalogoTipoReporteController;
+use App\Http\Controllers\ContractedMunicipalityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DefaultController;
 use App\Http\Controllers\UtilitieController;
@@ -43,6 +46,28 @@ Route::controller(CommonController::class)->group(function () {
     Route::post('password/update', 'passwordUpdate')->name('admin.password.update');
 });
 
+/************* Admin: Catalog Tipo Reporte ***************/
+Route::controller(CatalogoTipoReporteController::class)->group(function () {
+    Route::get('catalogo/tipo-reporte', 'reportsType')->name('admin.catalog.reports.type');
+    Route::get('catalogo/tipo-reporte/agregar', 'addReportType')->name('admin.catalog.reports.type.add');
+    Route::post('catalogo/tipo-reporte/store', 'storeReportType')->name('admin.catalog.reports.type.store');
+    Route::get('catalogo/tipo-reporte/editar/{id}', 'editReportType')->name('admin.catalog.reports.type.edit');
+    Route::put('catalogo/tipo-reporte/update/{id}', 'updateReportType')->name('admin.catalog.reports.type.update');
+    Route::get('catalogo/tipo-reporte/detalle/{id}', 'detailReportType')->name('admin.catalog.reports.type.detail');
+    Route::delete('catalogo/tipo-reporte/delete/{id}', 'deleteReportType')->name('admin.catalog.reports.type.delete');
+});
+
+Route::controller(CatalogoEstadoController::class)->group(function () {
+    Route::get('catalogo/estados', 'states')->name('admin.catalog.states');
+    //Route::get('catalogo/estados/editar/{id}', 'stateEditar')->name('admin.catalog.state.edit');
+    Route::get('catalogo/estados/{estadoPolId}/{estadoPolNumero}', 'stateDetail')->name('admin.catalog.state.detail');
+});
+
+Route::controller(CatalogoMunicipioController::class)->group(function () {
+    Route::get('catalogo/municipios', 'municipalities')->name('admin.catalog.municipalities');
+    Route::get('catalogo/municipios/{estadoPolId}/{municipioPolId}/{municipioPolNumero}', 'municipalityDetail')->name('admin.catalog.municipality.detail');
+});
+
 /************* Admin: Contracted Municipalities ***************/
 Route::controller(ContractedMunicipalityController::class)->group(function () {
     Route::get('municipios-contratados', 'index')->name('admin.contractedMunicipality.all');
@@ -52,6 +77,8 @@ Route::controller(ContractedMunicipalityController::class)->group(function () {
     Route::get('municipios-contratados/editar/{id}', 'edit')->name('admin.contractedMunicipality.edit');
     Route::post('municipios-contratados/update/{id}', 'update')->name('admin.contractedMunicipality.update');
     Route::get('municipios-contratados/delete/{id}', 'destroy')->name('admin.contractedMunicipality.delete');
+
+    Route::get('municipios-contratados/servicios/{id}', 'services')->name('admin.contractedMunicipality.services');
 });
 
 Route::controller(UserController::class)->group(function () {

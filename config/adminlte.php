@@ -344,6 +344,51 @@ return [
         ],
 
         ['header' => 'Opciones del sistema', 'can' => ['admin.contractedMunicipality.all']],
+
+        [
+            'text'    => 'Catálogos',
+            'icon'    => 'fas fa-fw fa-folder',
+            'active' => ['app/catalogo*'],
+            'can' => ['admin.catalog.reports.type', 'admin.catalog.states', 'admin.catalog.municipalities', 'admin.catalog.terms'],
+            'submenu' => [
+                [
+                    'text' => 'Tipo de reporte',
+                    'route' => 'admin.catalog.reports.type',
+                    'active' => ['app/catalogo/tipo-reporte*'],
+                    'can' => 'admin.catalog.reports.type',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                ],
+                [
+                    'text' => 'Estados',
+                    'route' => 'admin.catalog.states',
+                    'active' => ['app/catalogo/estados*'],
+                    'can' => 'admin.catalog.states',
+                    'icon' => 'fas fa-fw fa-map',
+                ],
+                [
+                    'text' => 'Municipios',
+                    'route' => 'admin.catalog.municipalities',
+                    'active' => ['app/catalogo/municipios*'],
+                    'can' => 'admin.catalog.municipalities',
+                    'icon' => 'fas fa-fw fa-map-marker-alt',
+                ],
+                [
+                    'text' => 'Estatus - Reporte',
+                    'route' => 'admin.catalog.report.status',
+                    'active' => ['app/catalogo/reporte-estatus*'],
+                    'can' => 'admin.catalog.report.status',
+                    'icon' => 'fas fa-fw fa-tasks',
+                ],
+                [
+                    'text' => 'Términos',
+                    'route' => 'admin.catalog.terms',
+                    'active' => ['app/catalogo/terminos*'],
+                    'can' => 'admin.catalog.terms',
+                    'icon' => 'fas fa-fw fa-file-contract',
+                ],
+            ],
+        ],
+
         [
             'text'    => 'Contratados',
             'can'     => ['admin.contractedMunicipality.all'],

@@ -123,7 +123,7 @@
             </div>
 
             <div class="card-footer text-right">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+                <button type="submit" class="btn btn-custom"><i class="fas fa-save"></i> Guardar</button>
                 <a href="{{ route('admin.contractedMunicipality.all') }}" class="btn btn-default"><i
                         class="fas fa-arrow-left"></i> Regresar</a>
             </div>
