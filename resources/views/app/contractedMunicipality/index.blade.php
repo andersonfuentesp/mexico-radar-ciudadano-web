@@ -37,6 +37,7 @@
                         <th>Municipio</th>
                         <th>Fecha de Contrato</th>
                         <th>Estado del Contrato</th>
+                        <th>Cantidad de Servicios</th> <!-- Nueva columna -->
                         <th>Aplicación/Web</th>
                         <th>Acciones</th>
                     </tr>
@@ -58,6 +59,9 @@
                                     <span class="badge badge-danger">Inactivo</span>
                                 @endif
                             </td>
+
+                            <!-- Mostrar la cantidad de servicios -->
+                            <td class="text-center">{{ $municipality->services_count }}</td>
 
                             <!-- Columna para el enlace a la aplicación/web -->
                             <td class="text-center">

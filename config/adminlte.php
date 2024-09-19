@@ -397,7 +397,7 @@ return [
                 [
                     'text'   => 'Municipios contratados',
                     'route'  => 'admin.contractedMunicipality.all',
-                    'active' => ['app/municipios-contratados', 'app/municipios-contratados/edit*'],
+                    'active' => ['app/municipios-contratados', 'app/municipios-contratados/edit*', 'app/municipios-contratados/servicios*'],
                     'can'    => 'admin.contractedMunicipality.all',
                     'icon'   => 'fas fa-map-marked-alt', // Icono para ubicaciones
                 ],

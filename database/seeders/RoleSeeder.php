@@ -75,7 +75,16 @@ class RoleSeeder extends Seeder
             ->syncRoles([$role1]);
         Permission::create(['name' => 'admin.contractedMunicipality.delete', 'description' => 'Eliminar municipio contratado'])
             ->syncRoles([$role1]);
+
         Permission::create(['name' => 'admin.contractedMunicipality.services', 'description' => 'Servicios del municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.services.add', 'description' => 'Agregar servicio al municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.services.detail', 'description' => 'Detalle de servicio del municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.services.edit', 'description' => 'Editar datos del servicio del municipio contratado'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.contractedMunicipality.services.delete', 'description' => 'Eliminar servicio del municipio contratado'])
             ->syncRoles([$role1]);
 
         //Usuarios

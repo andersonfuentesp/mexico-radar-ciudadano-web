@@ -17,7 +17,8 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('municipality_id'); // Foreign key to contracted_municipalities
             $table->string('api_url'); // API URL of the service
-            $table->string('api_token')->nullable(); // Token for accessing the service (optional)
+            //$table->string('api_token')->nullable(); // Token for accessing the service (optional)
+            $table->string('method');
             $table->enum('response_format', ['JSON', 'XML', 'CSV', 'Other'])->default('JSON'); // Format of the response
             $table->string('service_name'); // Name of the web service (e.g., GetData, SubmitReport, etc.)
             $table->text('description')->nullable(); // Description of the service

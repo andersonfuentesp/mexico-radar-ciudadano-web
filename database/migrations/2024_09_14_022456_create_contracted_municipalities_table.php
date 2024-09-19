@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('name'); // Name of the municipality
             $table->text('description')->nullable(); // Description of the municipality
             $table->string('url')->nullable(); // URL link of the municipality
+            $table->string('token')->nullable();
             $table->date('contract_date'); // Date of the contract
             $table->string('contract_number')->nullable(); // Contract number or reference
             $table->string('contact_responsible', 100); // Responsible contact person

@@ -75,10 +75,16 @@ Route::controller(ContractedMunicipalityController::class)->group(function () {
     Route::post('municipios-contratados/store', 'store')->name('admin.contractedMunicipality.store');
     Route::get('municipios-contratados/detalle/{id}', 'detail')->name('admin.contractedMunicipality.detail');
     Route::get('municipios-contratados/editar/{id}', 'edit')->name('admin.contractedMunicipality.edit');
-    Route::post('municipios-contratados/update/{id}', 'update')->name('admin.contractedMunicipality.update');
-    Route::get('municipios-contratados/delete/{id}', 'destroy')->name('admin.contractedMunicipality.delete');
+    Route::put('municipios-contratados/update/{id}', 'update')->name('admin.contractedMunicipality.update');
+    Route::delete('municipios-contratados/delete/{id}', 'destroy')->name('admin.contractedMunicipality.delete');
 
     Route::get('municipios-contratados/servicios/{id}', 'services')->name('admin.contractedMunicipality.services');
+    Route::get('municipios-contratados/servicios/{id}/agregar', 'servicesAdd')->name('admin.contractedMunicipality.services.add');
+    Route::post('municipios-contratados/servicios/{id}/store', 'servicesStore')->name('admin.contractedMunicipality.services.store');
+    Route::get('municipios-contratados/servicios/{id}/detalle', 'servicesDetail')->name('admin.contractedMunicipality.services.detail');
+    Route::get('municipios-contratados/servicios/{municipalityId}/editar/{serviceId}', 'servicesEdit')->name('admin.contractedMunicipality.services.edit');
+    Route::put('municipios-contratados/servicios/{municipalityId}/update/{serviceId}', 'servicesUpdate')->name('admin.contractedMunicipality.services.update');
+    Route::delete('municipios-contratados/servicios/{municipalityId}/delete/{serviceId}', 'servicesDestroy')->name('admin.contractedMunicipality.services.delete');
 });
 
 Route::controller(UserController::class)->group(function () {
