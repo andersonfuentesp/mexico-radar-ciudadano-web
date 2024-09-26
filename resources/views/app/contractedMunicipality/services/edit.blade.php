@@ -8,10 +8,12 @@
                 <div class="p-3 mb-2 bg-light rounded">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.contractedMunicipality.all') }}"><i class="fas fa-city"></i> Municipios Contratados</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.contractedMunicipality.all') }}"><i
+                                    class="fas fa-city"></i> Municipios Contratados</a></li>
                         <li class="breadcrumb-item active"><a><i class="fas fa-edit"></i> Editar Servicio</a></li>
                     </ol>
-                    <h1 class="m-0" style="font-size: 23px;"><b>Editar Servicio del Municipio: {{ $municipality->name }}</b></h1>
+                    <h1 class="m-0" style="font-size: 23px;"><b>Editar Servicio del Municipio:
+                            {{ $municipality->name }}</b></h1>
                 </div>
             </div>
         </div>
@@ -24,7 +26,8 @@
             <h1 class="card-title"><i class="fas fa-edit"></i> Actualizar Servicio</h1>
         </div>
 
-        <form class="form-horizontal" method="POST" action="{{ route('admin.contractedMunicipality.services.update', ['municipalityId' => encrypt($municipality->id), 'serviceId' => encrypt($service->id)]) }}">
+        <form class="form-horizontal" method="POST"
+            action="{{ route('admin.contractedMunicipality.services.update', ['municipalityId' => encrypt($municipality->id), 'serviceId' => encrypt($service->id)]) }}">
             @csrf
             @method('PUT')
 
@@ -43,26 +46,39 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="service_name"><i class="fas fa-cogs mr-2"></i> Nombre del Servicio</label>
-                            <input type="text" name="service_name" class="form-control" value="{{ $service->service_name }}" required>
+                            <input type="text" name="service_name" class="form-control"
+                                value="{{ $service->service_name }}" required>
                         </div>
 
                         <div class="form-group">
                             <label for="api_url"><i class="fas fa-link mr-2"></i> API URL</label>
-                            <input type="url" name="api_url" class="form-control" value="{{ $service->api_url }}" required>
+                            <div class="input-group">
+                                <!-- Mostrar la URL del municipio y el campo para el segmento adicional -->
+                                <input type="text" class="form-control" value="{{ $municipality->url }}" readonly>
+                                <input type="text" name="api_url" class="form-control" value="{{ $service->api_url }}"
+                                    required placeholder="Segmento adicional de la URL">
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="api_token"><i class="fas fa-key mr-2"></i> Token de API</label>
-                            <input type="text" name="api_token" class="form-control" value="{{ $service->api_token }}">
+                            <label for="municipality_token"><i class="fas fa-key mr-2"></i> Token de API del Municipio (solo
+                                lectura)</label>
+                            <!-- Mostrar el token del municipio contratado -->
+                            <input type="text" name="municipality_token" class="form-control"
+                                value="{{ $municipality->token }}" readonly>
                         </div>
 
                         <div class="form-group">
                             <label for="response_format"><i class="fas fa-file-code mr-2"></i> Formato de Respuesta</label>
                             <select name="response_format" class="form-control select2" required>
-                                <option value="JSON" {{ $service->response_format == 'JSON' ? 'selected' : '' }}>JSON</option>
-                                <option value="XML" {{ $service->response_format == 'XML' ? 'selected' : '' }}>XML</option>
-                                <option value="CSV" {{ $service->response_format == 'CSV' ? 'selected' : '' }}>CSV</option>
-                                <option value="Other" {{ $service->response_format == 'Other' ? 'selected' : '' }}>Otro</option>
+                                <option value="JSON" {{ $service->response_format == 'JSON' ? 'selected' : '' }}>JSON
+                                </option>
+                                <option value="XML" {{ $service->response_format == 'XML' ? 'selected' : '' }}>XML
+                                </option>
+                                <option value="CSV" {{ $service->response_format == 'CSV' ? 'selected' : '' }}>CSV
+                                </option>
+                                <option value="Other" {{ $service->response_format == 'Other' ? 'selected' : '' }}>Otro
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -86,7 +102,8 @@
 
             <div class="card-footer text-right">
                 <button type="submit" class="btn btn-custom"><i class="fas fa-save"></i> Actualizar Servicio</button>
-                <a href="{{ route('admin.contractedMunicipality.services', encrypt($municipality->id)) }}" class="btn btn-default"><i class="fas fa-arrow-left"></i> Regresar</a>
+                <a href="{{ route('admin.contractedMunicipality.services', encrypt($municipality->id)) }}"
+                    class="btn btn-default"><i class="fas fa-arrow-left"></i> Regresar</a>
             </div>
         </form>
     </div>

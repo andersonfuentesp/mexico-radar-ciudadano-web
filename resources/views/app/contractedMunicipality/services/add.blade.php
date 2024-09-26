@@ -30,17 +30,17 @@
             action="{{ route('admin.contractedMunicipality.services.store', encrypt($municipality->id)) }}">
             @csrf
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <div class="card-body">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -56,6 +56,16 @@
                                 <input type="text" name="api_url" class="form-control"
                                     placeholder="Segmento adicional de la URL" required>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="method"><i class="fas fa-code-branch mr-2"></i> Método HTTP</label>
+                            <select name="method" class="form-control select2" required>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
                         </div>
 
                         <div class="form-group">

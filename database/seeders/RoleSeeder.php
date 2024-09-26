@@ -64,6 +64,14 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.catalog.neighborhood.delete', 'description' => 'Eliminar colonia - Catálogo'])
             ->syncRoles([$role1]);
 
+        //Catálogo - Estatus Reporte
+        Permission::create(['name' => 'admin.catalog.report.status', 'description' => 'Ver lista de reporte de estatus - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.report.status.add', 'description' => 'Agregar reporte de estatus - Catálogo'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.catalog.report.status.delete', 'description' => 'Eliminar reporte de estatus - Catálogo'])
+            ->syncRoles([$role1]);
+
         //Municipios contratados
         Permission::create(['name' => 'admin.contractedMunicipality.all', 'description' => 'Gestionar municipios contratados'])
             ->syncRoles([$role1]);
@@ -85,6 +93,18 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.contractedMunicipality.services.edit', 'description' => 'Editar datos del servicio del municipio contratado'])
             ->syncRoles([$role1]);
         Permission::create(['name' => 'admin.contractedMunicipality.services.delete', 'description' => 'Eliminar servicio del municipio contratado'])
+            ->syncRoles([$role1]);
+
+        //Reporte
+        Permission::create(['name' => 'admin.reports.all', 'description' => 'Ver lista de reportes ciudadano - Reportes'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.reports.add', 'description' => 'Agregar reporte ciudadano - Reportes'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.reports.edit', 'description' => 'Editar reporte ciudadano - Reportes'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.reports.detail', 'description' => 'Detalle de reporte ciudadano - Reportes'])
+            ->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.reports.delete', 'description' => 'Eliminar reporte ciudadano - Reportes'])
             ->syncRoles([$role1]);
 
         //Usuarios

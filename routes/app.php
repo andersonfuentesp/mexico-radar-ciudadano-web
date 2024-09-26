@@ -9,7 +9,10 @@ use App\Http\Controllers\Catalogo\CatalogoMunicipioController;
 use App\Http\Controllers\Catalogo\CatalogoTipoReporteController;
 use App\Http\Controllers\ContractedMunicipalityController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Catalogo\CatalogoColoniaController;
+use App\Http\Controllers\Catalogo\CatalogoEstatusReporteController;
 use App\Http\Controllers\DefaultController;
+use App\Http\Controllers\Reporte\ReporteController;
 use App\Http\Controllers\UtilitieController;
 
 /*
@@ -68,6 +71,22 @@ Route::controller(CatalogoMunicipioController::class)->group(function () {
     Route::get('catalogo/municipios/{estadoPolId}/{municipioPolId}/{municipioPolNumero}', 'municipalityDetail')->name('admin.catalog.municipality.detail');
 });
 
+Route::controller(CatalogoColoniaController::class)->group(function () {
+    Route::get('catalogo/colonias', 'neighborhoods')->name('admin.catalog.neighborhoods');
+    Route::get('catalogo/colonias/agregar', 'addNeighborhood')->name('admin.catalog.neighborhood.add');
+    Route::post('catalogo/colonias/store', 'storeNeighborhood')->name('admin.catalog.neighborhood.store');
+    Route::get('catalogo/colonias/editar/{id}', 'editNeighborhood')->name('admin.catalog.neighborhood.edit');
+    Route::put('catalogo/colonias/update/{id}', 'updateNeighborhood')->name('admin.catalog.neighborhood.update');
+    Route::delete('catalogo/colonias/delete/{state_id}/{municipality_id}/{neighborhood_id}', 'deleteNeighborhood')->name('admin.catalog.neighborhood.delete');
+});
+
+Route::controller(CatalogoEstatusReporteController::class)->group(function () {
+    Route::get('catalogo/reporte-estatus', 'reportStatus')->name('admin.catalog.report.status');
+    Route::get('catalogo/reporte-estatus/agregar', 'addReportStatus')->name('admin.catalog.report.status.add');
+    Route::post('catalogo/reporte-estatus/store', 'storeReportStatus')->name('admin.catalog.report.status.store');
+    Route::delete('catalogo/reporte-estatus/delete/{id}', 'deleteReportStatus')->name('admin.catalog.report.status.delete');
+});
+
 /************* Admin: Contracted Municipalities ***************/
 Route::controller(ContractedMunicipalityController::class)->group(function () {
     Route::get('municipios-contratados', 'index')->name('admin.contractedMunicipality.all');
@@ -85,6 +104,16 @@ Route::controller(ContractedMunicipalityController::class)->group(function () {
     Route::get('municipios-contratados/servicios/{municipalityId}/editar/{serviceId}', 'servicesEdit')->name('admin.contractedMunicipality.services.edit');
     Route::put('municipios-contratados/servicios/{municipalityId}/update/{serviceId}', 'servicesUpdate')->name('admin.contractedMunicipality.services.update');
     Route::delete('municipios-contratados/servicios/{municipalityId}/delete/{serviceId}', 'servicesDestroy')->name('admin.contractedMunicipality.services.delete');
+});
+
+Route::controller(ReporteController::class)->group(function () {
+    Route::get('reportes', 'reporteCiudadano')->name('admin.reports.all');
+    Route::get('reportes/agregar', 'addReporteCiudadano')->name('admin.reports.add');
+    Route::post('reportes/store', 'storeReporteCiudadano')->name('admin.reports.store');
+    Route::get('reportes/editar/{id}', 'editReporteCiudadano')->name('admin.reports.edit');
+    Route::put('reportes/update/{id}', 'updateReporteCiudadano')->name('admin.reports.update');
+    Route::get('reportes/detalle/{id}', 'detailReporteCiudadano')->name('admin.reports.detail');
+    Route::delete('reportes/delete/{id}', 'deleteReporteCiudadano')->name('admin.reports.delete');
 });
 
 Route::controller(UserController::class)->group(function () {

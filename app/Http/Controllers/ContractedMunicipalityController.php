@@ -147,23 +147,30 @@ class ContractedMunicipalityController extends Controller
         $municipios = Municipio::where('EstadoId', $data->state_id)->get();
 
         // Retornar la vista con los datos
-        return view('app.contractedMunicipality.edit', compact('data', 'estados', 'municipios', 'userRoles'));
+        return view('app.contractedMunicipality.edit', compact('data', 'estados', 'municipios'));
     }
 
     // Actualizar los datos de un municipio contratado
     public function update(Request $request, $id)
     {
+        // Validaciones del formulario
         $request->validate([
             'name' => 'required|string|max:255',
-            'state_id' => 'required|integer|exists:states,id',
-            'municipality_id' => 'required|integer|exists:municipalities,id',
+            'state_id' => 'required|integer|exists:estado,EstadoId', // Validación de estado (tabla 'estado')
+            'municipality_id' => 'required|integer|exists:municipio,MunicipioId', // Validación de municipio (tabla 'municipio')
             'contract_date' => 'required|date',
             'contact_responsible' => 'required|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'contact_phone1' => 'required|string|max:15',
+            'token' => 'nullable|string|max:255', // Validación del token (opcional)
         ]);
 
+        $id= decrypt($id);
+
+        // Buscar el municipio contratado por ID
         $data = ContractedMunicipality::findOrFail($id);
+
+        // Actualizar los datos del municipio contratado
         $data->name = $request->name;
         $data->state_id = $request->state_id;
         $data->municipality_id = $request->municipality_id;
@@ -175,16 +182,21 @@ class ContractedMunicipalityController extends Controller
         $data->contact_phone2 = $request->contact_phone2;
         $data->description = $request->description;
         $data->url = $request->url;
+        $data->token = $request->token; // Actualización del token
         $data->contract_number = $request->contract_number;
-        $data->status = $request->status ?? true;
+        $data->status = $request->status ?? true; // Actualizar estado del contrato (activo/inactivo)
+
+        // Guardar los cambios
         $data->save();
 
+        // Notificación de éxito
         $notification = [
             'message' => 'Municipio contratado actualizado con éxito',
             'alert-type' => 'success',
         ];
 
-        return redirect()->route('admin.contractedMunicipality.index')->with($notification);
+        // Redirigir al listado de municipios contratados
+        return redirect()->route('admin.contractedMunicipality.all')->with($notification);
     }
 
     // Eliminar un municipio contratado
@@ -242,21 +254,27 @@ class ContractedMunicipalityController extends Controller
 
     public function servicesStore(Request $request, $id)
     {
+        // Desencriptar el ID
+        $decryptedId = decrypt($id);
+
+        // Obtener los datos del municipio
+        $municipality = ContractedMunicipality::findOrFail($decryptedId);
+
+        // Validar el request
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'api_url' => 'required|url',
+            'api_url' => 'required|string',  // Solo validamos el segmento de la URL
+            'method' => 'required|in:GET,POST,PUT,DELETE',
             'response_format' => 'required|in:JSON,XML,CSV,Other',
             'status' => 'boolean',
         ]);
-
-        // Desencriptar el ID
-        $decryptedId = decrypt($id);
 
         // Guardar el nuevo servicio
         $service = new MunicipalityService();
         $service->municipality_id = $decryptedId;
         $service->service_name = $request->service_name;
-        $service->api_url = $request->api_url;
+        $service->api_url = $request->api_url;  // Guardar solo el segmento adicional
+        $service->method = $request->method;
         $service->response_format = $request->response_format;
         $service->description = $request->description;
         $service->status = $request->status ?? true;
@@ -298,22 +316,24 @@ class ContractedMunicipalityController extends Controller
 
     public function servicesUpdate(Request $request, $municipalityId, $serviceId)
     {
+        // Validar el request
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'api_url' => 'required|url',
+            'api_url' => 'required|string',  // Validamos el segmento adicional de la URL
             'api_token' => 'nullable|string|max:255',
             'response_format' => 'required|in:JSON,XML,CSV,Other',
             'status' => 'boolean',
         ]);
 
+        // Desencriptar IDs
         $decryptedMunicipalityId = decrypt($municipalityId);
         $decryptedServiceId = decrypt($serviceId);
 
         // Actualizar el servicio
         $service = MunicipalityService::findOrFail($decryptedServiceId);
         $service->service_name = $request->service_name;
-        $service->api_url = $request->api_url;
-        $service->api_token = $request->api_token;
+        $service->api_url = $request->api_url;  // Aquí se actualiza solo el segmento de la URL
+        //$service->api_token = $request->api_token;
         $service->response_format = $request->response_format;
         $service->description = $request->description;
         $service->status = $request->status ?? true;

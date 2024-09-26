@@ -41,7 +41,8 @@
                 <div class="col-md-4 mb-3">
                     <div class="p-2 border rounded h-100">
                         <h6><strong>API URL:</strong></h6>
-                        <p>{{ $service->api_url }}</p>
+                        <!-- Aquí concatenamos la URL del municipio con la URL del servicio -->
+                        <p>{{ rtrim($municipality->url, '/') . '/' . ltrim($service->api_url, '/') }}</p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">

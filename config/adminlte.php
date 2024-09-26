@@ -373,6 +373,13 @@ return [
                     'icon' => 'fas fa-fw fa-map-marker-alt',
                 ],
                 [
+                    'text' => 'Colonias',
+                    'route' => 'admin.catalog.neighborhoods',
+                    'active' => ['app/catalogo/colonias*'],
+                    'can' => 'admin.catalog.neighborhoods',
+                    'icon' => 'fas fa-fw fa-map-pin',
+                ],
+                [
                     'text' => 'Estatus - Reporte',
                     'route' => 'admin.catalog.report.status',
                     'active' => ['app/catalogo/reporte-estatus*'],
@@ -397,7 +404,7 @@ return [
                 [
                     'text'   => 'Municipios contratados',
                     'route'  => 'admin.contractedMunicipality.all',
-                    'active' => ['app/municipios-contratados', 'app/municipios-contratados/edit*', 'app/municipios-contratados/servicios*'],
+                    'active' => ['app/municipios-contratados', 'app/municipios-contratados/edit*', 'app/municipios-contratados/servicios*', 'app/municipios-contratados/detalle*'],
                     'can'    => 'admin.contractedMunicipality.all',
                     'icon'   => 'fas fa-map-marked-alt', // Icono para ubicaciones
                 ],
@@ -407,6 +414,28 @@ return [
                     'active' => ['app/municipios-contratados/agregar'],
                     'can'    => 'admin.contractedMunicipality.add',
                     'icon'   => 'fas fa-file-signature', // Icono para firmar contratos
+                ],
+            ],
+        ],
+
+        [
+            'text'    => 'Reportes',
+            'can'     => ['admin.reports.all', 'admin.reports.add'],
+            'icon'    => 'fas fa-fw fa-clipboard-list', // Icono relacionado con reportes
+            'submenu' => [
+                [
+                    'text'   => 'Todos los reportes',
+                    'route'  => 'admin.reports.all',
+                    'active' => ['app/reportes', 'app/reportes/detalle*', 'app/reportes/edit*'],
+                    'can'    => 'admin.reports.all',
+                    'icon'   => 'fas fa-list-alt', // Icono para listar reportes
+                ],
+                [
+                    'text'   => 'Agregar reporte',
+                    'route'  => 'admin.reports.add',
+                    'active' => ['app/reportes/agregar'],
+                    'can'    => 'admin.reports.add',
+                    'icon'   => 'fas fa-plus-circle', // Icono para agregar nuevo reporte
                 ],
             ],
         ],

@@ -93,6 +93,16 @@
                 </div>
             </div>
 
+            <!-- Sección para el token del municipio contratado -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="p-2 border rounded h-100">
+                        <h6><strong>Token de Autenticación:</strong></h6>
+                        <p>{{ $municipality->token ?? 'No disponible' }}</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-md-12 mb-3">
                     <div class="p-2 border rounded h-100">
