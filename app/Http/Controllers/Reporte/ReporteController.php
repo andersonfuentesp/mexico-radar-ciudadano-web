@@ -34,13 +34,14 @@ class ReporteController extends Controller
                     ->on('reports.municipality_id', '=', 'neighborhoods.municipality_id')
                     ->on('reports.neighborhood_id', '=', 'neighborhoods.neighborhood_id');
             })
+            ->leftJoin('report_types', 'reports.report_type_id', '=', 'report_types.ReportTypeId')
             ->select(
                 'reports.*',
                 'estado.EstadoNombre',
                 'municipio.MunicipioNombre',
                 'report_statuses.report_status_name as ReportStatusName',
                 'neighborhoods.neighborhood_name as NeighborhoodName',
-                'report_dependencies.DependencyName'
+                'report_types.ReportTypeName'
             )
             ->orderByDesc('reports.created_at');
 
@@ -48,16 +49,43 @@ class ReporteController extends Controller
         if ($request->has('search_estado')) {
             $query->where('estado.EstadoNombre', 'like', '%' . $request->search_estado . '%');
         }
+
         if ($request->has('search_municipio')) {
             $query->where('municipio.MunicipioNombre', 'like', '%' . $request->search_municipio . '%');
         }
-        if ($request->has('search_dependencia')) {
-            $query->where('report_dependencies.DependencyName', 'like', '%' . $request->search_dependencia . '%');
+
+        if ($request->has('report_type')) {
+            $query->where('reports.report_type_id', $request->report_type);
         }
 
+        if ($request->has('search_vigencia_inicial') && !empty($request->search_vigencia_inicial)) {
+            $query->whereDate('reports.created_at', '>=', $request->search_vigencia_inicial);
+        }
+
+        if ($request->has('search_vigencia_final') && !empty($request->search_vigencia_final)) {
+            $query->whereDate('reports.created_at', '<=', $request->search_vigencia_final);
+        }
+
+        if ($request->has('report_status')) {
+            $query->where('reports.report_status_id', $request->report_status);
+        }
+
+        // Opción para filtrar si el municipio es contratado o no
+        if ($request->has('municipio_contratado')) {
+            if ($request->municipio_contratado == '1') {
+                $query->whereNotNull('reports.municipio_id');
+            } else {
+                $query->whereNull('reports.municipio_id');
+            }
+        }
+
+        // Paginación
         $reports = $query->paginate(10);
 
-        return view('app.reportes.index', compact('reports', 'userRoles'));
+        // Obtener tipos de reporte y estatus de reporte para los selectores
+        $reportTypes = DB::table('report_types')->pluck('ReportTypeName', 'ReportTypeId');
+        $reportStatuses = DB::table('report_statuses')->pluck('report_status_name', 'report_status_id');
+
+        return view('app.reportes.index', compact('reports', 'reportTypes', 'reportStatuses', 'userRoles'));
     }
-    
 }

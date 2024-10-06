@@ -95,7 +95,7 @@
                                 <button class="btn btn-warning test-connection-button"
                                     data-url="{{ rtrim($municipality->url, '/') . '/' . ltrim($service->api_url, '/') }}"
                                     data-method="{{ $service->method }}" data-token="{{ $municipality->token }}"
-                                    title="Probar Conectividad">
+                                    data-index="{{ $key }}" title="Probar Conectividad">
                                     <i class="fas fa-plug"></i>
                                 </button>
 

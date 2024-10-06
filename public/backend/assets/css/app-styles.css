@@ -266,3 +266,17 @@ body {
         /* Espacio entre los elementos */
     }
 }
+
+/* Cuando el sidebar está colapsado, ocultar el logo grande y mostrar el logo pequeño */
+.sidebar-collapse .logo-xl {
+    display: none;
+}
+
+.sidebar-collapse .logo-xs {
+    display: inline-block !important;
+}
+
+/* Cuando el sidebar está expandido, ocultar el logo pequeño */
+.logo-xs {
+    display: none;
+}

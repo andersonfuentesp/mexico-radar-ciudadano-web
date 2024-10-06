@@ -25,6 +25,10 @@ Route::controller(ApiController::class)->group(function () {
     Route::get('/terms', 'getTerms');
 
     Route::get('/numeros', 'getEmergencyNumbers');
+
+    // Nueva ruta para guardar el reporte
+    Route::get('/report', 'getReport');
+    Route::post('/save-report', 'saveReport');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

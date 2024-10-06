@@ -113,7 +113,7 @@
             </div>
 
             <div class="card-footer">
-                <input type="submit" class="btn btn-info btn-rounded waves-effect waves-light" value="Actualizar datos de perfil">
+                <input type="submit" class="btn btn-custom btn-rounded waves-effect waves-light" value="Actualizar datos de perfil">
                 <a href="{{ route('admin.profile') }}" class="btn btn-default"><i class="fas fa-arrow-left"></i> Regresar</a>
             </div>
         </form>

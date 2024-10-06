@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\ReportStatus;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,6 +20,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory(5)->create();
 
         $this->call([
+            ReportStatusSeeder::class,
+            ReportTypeSeeder::class,
             RoleSeeder::class
         ]);
 

@@ -41,10 +41,46 @@
                                     value="{{ request()->get('search_municipio') }}">
                             </div>
                             <div class="col-auto">
-                                <label for="search_dependencia" class="sr-only">Dependencia</label>
-                                <input type="text" name="search_dependencia" id="search_dependencia"
-                                    class="form-control mb-2 custom-input" placeholder="Buscar por dependencia"
-                                    value="{{ request()->get('search_dependencia') }}">
+                                <label for="report_type" class="sr-only">Tipo de Reporte</label>
+                                <select name="report_type" id="report_type" class="form-control mb-2 custom-input">
+                                    <option value="">Selecciona Tipo de Reporte</option>
+                                    @foreach ($reportTypes as $id => $name)
+                                        <option value="{{ $id }}" {{ request()->get('report_type') == $id ? 'selected' : '' }}>
+                                            {{ $name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="municipio_contratado" class="sr-only">Municipio Contratado</label>
+                                <select name="municipio_contratado" id="municipio_contratado" class="form-control mb-2 custom-input">
+                                    <option value="">Contratado</option>
+                                    <option value="1" {{ request()->get('municipio_contratado') == '1' ? 'selected' : '' }}>Sí</option>
+                                    <option value="0" {{ request()->get('municipio_contratado') == '0' ? 'selected' : '' }}>No</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="search_vigencia_inicial" class="sr-only">Fecha Inicio</label>
+                                <input type="date" name="search_vigencia_inicial" id="search_vigencia_inicial"
+                                    class="form-control mb-2 custom-input"
+                                    value="{{ request()->get('search_vigencia_inicial') }}">
+                            </div>
+                            <div class="col-auto">
+                                <label for="search_vigencia_final" class="sr-only">Fecha Fin</label>
+                                <input type="date" name="search_vigencia_final" id="search_vigencia_final"
+                                    class="form-control mb-2 custom-input"
+                                    value="{{ request()->get('search_vigencia_final') }}">
+                            </div>
+                            <div class="col-auto">
+                                <label for="report_status" class="sr-only">Estatus</label>
+                                <select name="report_status" id="report_status" class="form-control mb-2 custom-input">
+                                    <option value="">Selecciona Estatus</option>
+                                    @foreach ($reportStatuses as $id => $status)
+                                        <option value="{{ $id }}" {{ request()->get('report_status') == $id ? 'selected' : '' }}>
+                                            {{ $status }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-auto">
                                 <button type="submit" class="btn btn-custom mb-2 custom-button"><i
@@ -68,7 +104,7 @@
                         <th>ID</th>
                         <th>Estado</th>
                         <th>Municipio</th>
-                        <th>Dependencia</th>
+                        <th>Tipo de Reporte</th>
                         <th>Colonia</th>
                         <th>Dirección</th>
                         <th>Comentario</th>
@@ -84,7 +120,7 @@
                             <td>{{ $report->report_id }}</td>
                             <td>{{ $report->EstadoNombre }}</td>
                             <td>{{ $report->MunicipioNombre }}</td>
-                            <td>{{ $report->DependencyName }}</td>
+                            <td>{{ $report->ReportTypeName }}</td>
                             <td>{{ $report->NeighborhoodName }}</td>
                             <td>{!! $report->report_address !!}</td>
                             <td>{!! $report->report_comment !!}</td>
@@ -124,7 +160,11 @@
                 {{ $reports->appends([
                     'search_estado' => request()->get('search_estado'),
                     'search_municipio' => request()->get('search_municipio'),
-                    'search_dependencia' => request()->get('search_dependencia'),
+                    'report_type' => request()->get('report_type'),
+                    'search_vigencia_inicial' => request()->get('search_vigencia_inicial'),
+                    'search_vigencia_final' => request()->get('search_vigencia_final'),
+                    'report_status' => request()->get('report_status'),
+                    'municipio_contratado' => request()->get('municipio_contratado')
                 ])->links() }}
             </div>
         </div>

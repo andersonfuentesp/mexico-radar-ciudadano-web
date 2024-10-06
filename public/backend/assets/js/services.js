@@ -2,13 +2,16 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedUrl = '';
     let selectedMethod = '';
     let selectedToken = '';
+    let selectedIndex = '';
 
     // Abrir modal al hacer click en "Probar Conectividad"
     document.querySelectorAll('.test-connection-button').forEach((button) => {
         button.addEventListener('click', function () {
             selectedUrl = this.dataset.url;
             selectedMethod = this.dataset.method;
-            selectedToken = this.dataset.token; // Aquí capturamos el token
+            selectedToken = this.dataset.token; // Capturamos el token
+            selectedIndex = this.dataset.index; // Capturamos el índice de la fila
+
             document.getElementById('modal-service-url').textContent = selectedUrl;
             $('#connectionModal').modal('show');
         });
@@ -109,8 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const blob = new Blob([jsonData], { type: 'application/json' }); // Crear blob con tipo JSON
                 const url = window.URL.createObjectURL(blob); // Generar URL para descargar el archivo
 
-                // Crear un botón de descarga o activar uno existente
-                const downloadLogButton = document.getElementById(`download-log-0`);
+                // Crear un botón de descarga o activar uno existente basado en el índice
+                const downloadLogButton = document.getElementById(`download-log-${selectedIndex}`);
                 downloadLogButton.href = url;
                 downloadLogButton.download = 'response_data.json'; // Asignar nombre del archivo
                 downloadLogButton.style.display = 'inline-block'; // Mostrar el botón de descarga
@@ -119,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 downloadLogButton.click();
             })
             .catch(error => {
+                Swal.close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de Conexión',
@@ -129,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const blob = new Blob([logData], { type: 'text/plain' });
                 const url = window.URL.createObjectURL(blob);
 
-                const downloadLogButton = document.getElementById(`download-log-0`);
+                const downloadLogButton = document.getElementById(`download-log-${selectedIndex}`);
                 downloadLogButton.href = url;
                 downloadLogButton.download = 'log_conexion.txt';
                 downloadLogButton.style.display = 'inline-block';

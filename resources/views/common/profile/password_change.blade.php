@@ -63,7 +63,7 @@
             </div>
 
             <div class="card-footer">
-                <button type="submit" class="btn btn-info btn-rounded waves-effect waves-light">
+                <button type="submit" class="btn btn-custom btn-rounded waves-effect waves-light">
                     <i class="fas fa-sync-alt"></i> Actualizar datos de seguridad
                 </button>
                 <a href="{{ route('admin.index') }}" class="btn btn-default">
