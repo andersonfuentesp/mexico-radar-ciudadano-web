@@ -33,7 +33,55 @@ class CommonController extends Controller
 
     public function index()
     {
-        return view('common.index');
+        $municipalities = DB::table('contracted_municipalities')
+            ->leftJoin('estado', 'contracted_municipalities.state_id', '=', 'estado.EstadoId')
+            ->leftJoin('municipio', function ($join) {
+                $join->on('contracted_municipalities.state_id', '=', 'municipio.EstadoId')
+                    ->on('contracted_municipalities.municipality_id', '=', 'municipio.MunicipioId');
+            })
+            ->leftJoin('municipality_services', 'contracted_municipalities.id', '=', 'municipality_services.municipality_id')
+            ->select(
+                'contracted_municipalities.name as municipio',
+                'estado.EstadoNombre as estado',
+                DB::raw('COUNT(municipality_services.id) as services_count')
+            )
+            ->groupBy('contracted_municipalities.name', 'estado.EstadoNombre')
+            ->orderByDesc('contracted_municipalities.created_at')
+            ->get();
+
+        // Preparar datos para el gráfico de barras
+        $categories = $municipalities->pluck('municipio')->toArray();
+        $serviceCounts = $municipalities->pluck('services_count')->toArray();
+
+        // Datos para gráfico de barras
+        $barData = json_encode([
+            'categories' => $categories,
+            'series' => [
+                [
+                    'name' => 'Cantidad de Servicios',
+                    'data' => $serviceCounts,
+                    'color' => '#4CAF50' // Color principal
+                ]
+            ]
+        ]);
+
+        // Datos para gráfico de pastel
+        $pieData = json_encode([
+            'series' => [
+                [
+                    'name' => 'Servicios',
+                    'data' => $municipalities->map(function ($item) {
+                        return [
+                            'name' => $item->municipio,
+                            'y' => $item->services_count,
+                            'color' => '#' . substr(md5(rand()), 0, 6) // Colores dinámicos para cada municipio
+                        ];
+                    })->toArray()
+                ]
+            ]
+        ]);
+
+        return view('common.index', compact('barData', 'pieData'));
     }
 
     public function profile()

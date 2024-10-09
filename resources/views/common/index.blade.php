@@ -1,5 +1,5 @@
 @extends('master')
-@section('title', 'Radar ciudadano - Monitoreo')
+@section('title', 'Radar Ciudadano - Monitoreo')
 
 @section('content_header')
     <div class="card container-fluid mb-0">
@@ -21,7 +21,25 @@
 @section('content')
     <div class="card">
         <div class="card-body">
+            <!-- Inputs ocultos para pasar la data a los gráficos -->
+            <input type="hidden" id="barChartData" value="{{ $barData }}">
+            <input type="hidden" id="pieChartData" value="{{ $pieData }}">
+
+            <!-- Diseño en dos columnas para los gráficos -->
+            <div class="row">
+                <!-- Gráfico de barras - 70% -->
+                <div class="col-md-8">
+                    <div id="barChartContainer" style="height: 400px;"></div>
+                </div>
+                <!-- Gráfico de pastel - 30% -->
+                <div class="col-md-4">
+                    <div id="pieChartContainer" style="height: 400px;"></div>
+                </div>
+            </div>
         </div>
     </div>
+@stop
 
+@section('jscode')
+    <script src="{{ asset('backend/assets/js/dashboard.js') }}"></script>
 @stop

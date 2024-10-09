@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReportStatusSeeder::class,
             ReportTypeSeeder::class,
-            RoleSeeder::class
+            RoleSeeder::class,
+            ContractedMunicipalitiesSeeder::class,
+            MunicipalityServicesSeeder::class
         ]);
 
         // \App\Models\User::factory()->create([

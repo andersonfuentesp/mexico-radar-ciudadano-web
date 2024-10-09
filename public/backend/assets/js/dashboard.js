@@ -1,167 +1,106 @@
-let chartData = JSON.parse(document.getElementById('chartData').value);
-let tiposChartData = JSON.parse(document.getElementById('tiposChartData').value);
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtener los datos desde los inputs ocultos
+    const barData = JSON.parse(document.getElementById('barChartData').value);
+    const pieData = JSON.parse(document.getElementById('pieChartData').value);
 
-// Función para actualizar el gráfico
-function updateRolesChart() {
+    initializeDarkModeObserver(barData, pieData);
+    updateChart('barChartContainer', barData, 'column');
+    updateChart('pieChartContainer', pieData, 'pie');
+});
+
+function updateChart(containerId, data, chartType) {
     const isDarkMode = document.body.classList.contains('dark-mode');
     const backgroundColor = isDarkMode ? '#303030' : '#FFFFFF';
     const textColor = isDarkMode ? '#C0C0C0' : '#333333';
 
-    Highcharts.chart('container', {
+    Highcharts.chart(containerId, {
         chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie',
-            backgroundColor: backgroundColor, // Fondo del gráfico
+            type: chartType,
+            backgroundColor: backgroundColor,
+            borderRadius: 10, // Bordes redondeados para más estilo
         },
         title: {
-            text: 'Porcentaje de usuarios por rol',
+            text: chartType === 'column' ? 'Cantidad de Servicios por Municipio' : 'Distribución de Servicios por Municipio',
             style: {
-                color: textColor, // Color del texto del título
+                color: textColor,
                 fontWeight: 'bold',
-                fontSize: '16px'
+                fontSize: '18px' // Aumentar tamaño de fuente del título
             }
         },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: 'usuarios'
+        xAxis: chartType === 'column' ? {
+            categories: data.categories,
+            labels: {
+                style: {
+                    color: textColor
+                }
             }
-        },
+        } : undefined,
+        yAxis: chartType === 'column' ? {
+            title: {
+                text: 'Cantidad de Servicios',
+                style: {
+                    color: textColor
+                }
+            },
+            labels: {
+                style: {
+                    color: textColor
+                }
+            }
+        } : undefined,
         plotOptions: {
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.y} usuarios'
-                }
-            }
-        },
-        series: [{
-            name: 'Porcentaje',
-            colorByPoint: true,
-            data: chartData // Usamos chartData directamente aquí.
-        }],
-        credits: {
-            enabled: false
-        }
-    });
-}
-
-function updateTiposOperacionChart() {
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const backgroundColor = isDarkMode ? '#303030' : '#FFFFFF';
-    const textColor = isDarkMode ? '#C0C0C0' : '#333333';
-
-    Highcharts.chart('operacionesTipoContainer', {
-        chart: {
-            type: 'bar',
-            backgroundColor: backgroundColor,
-            zoomType: 'y', // Permite hacer zoom en el eje Y
-            scrollablePlotArea: {
-                minWidth: 700, // Ajusta según necesidad
-                scrollPositionX: 1
-            }
-        },
-        title: {
-            text: 'Expedientes por Tipo de Operación',
-            style: {
-                color: textColor
-            }
-        },
-        xAxis: [{
-            categories: tiposChartData.map(tipo => tipo.name),
-            labels: {
-                style: {
-                    color: textColor
-                }
-            }
-        }],
-        yAxis: {
-            min: 0,
-            max: 10, // Establece un máximo visible que funcione para la paginación
-            scrollbar: {
-                enabled: true // Habilita el scrollbar en el eje Y
-            },
-            title: {
-                text: 'Cantidad de Expedientes',
-                style: {
-                    color: textColor
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: textColor,
+                        fontSize: '14px'
+                    }
                 }
             },
-            labels: {
-                style: {
-                    color: textColor
-                }
-            }
-        },
-        legend: {
-            itemStyle: {
-                color: textColor
-            },
-            reversed: true
-        },
-        plotOptions: {
-            bar: {
-                animation: true,
+            series: {
+                borderWidth: 0,
                 dataLabels: {
                     enabled: true,
                     style: {
                         color: textColor
                     }
                 }
-            },
-            series: {
-                stacking: 'normal'
             }
         },
-        tooltip: {
-            valueSuffix: ' expedientes'
-        },
-        series: [{
-            name: 'Expedientes',
-            data: tiposChartData.map((tipo, i) => ({
-                y: tipo.y,
-                color: Highcharts.getOptions().colors[i % Highcharts.getOptions().colors
-                    .length] // Cicla los colores disponibles
-            })),
-        }],
+        series: data.series,
         credits: {
             enabled: false
-        }
-    });
-}
-
-// Esta función se llamará cuando la página se cargue y cuando se detecten cambios en las clases del body
-function handleChartsChange() {
-    updateRolesChart(); // Actualiza el gráfico de roles
-    updateTiposOperacionChart(); // Actualiza el nuevo gráfico de tipos de operación
-}
-
-// Configura el observer para escuchar cambios en los atributos del body
-new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        if (mutation.attributeName === "class") {
-            var currentClassState = document.body.classList.contains('dark-mode');
-            // Verifica si el estado de 'dark-mode' ha cambiado
-            if (typeof window.lastClassState === 'undefined' || currentClassState !== window
-                .lastClassState) {
-                handleChartsChange(); // Llama a la función solo si el modo oscuro ha cambiado
+        },
+        legend: {
+            enabled: true,
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            itemStyle: {
+                color: textColor
             }
-            window.lastClassState =
-                currentClassState; // Actualiza el estado conocido de 'dark-mode'
         }
     });
-}).observe(document.body, {
-    attributes: true
-});
+}
 
-// Guarda el estado inicial de 'dark-mode'
-window.lastClassState = document.body.classList.contains('dark-mode');
-
-// Asegúrate de llamar a handleChartsChange cuando la página se carga
-document.addEventListener('DOMContentLoaded', handleChartsChange);
+function initializeDarkModeObserver(barData, pieData) {
+    new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (mutation.attributeName === "class") {
+                const currentClassState = document.body.classList.contains('dark-mode');
+                if (typeof window.lastClassState === 'undefined' || currentClassState !== window.lastClassState) {
+                    // Si el estado de modo oscuro cambió, actualizar los gráficos
+                    updateChart('barChartContainer', barData, 'column');
+                    updateChart('pieChartContainer', pieData, 'pie');
+                }
+                window.lastClassState = currentClassState;
+            }
+        });
+    }).observe(document.body, {
+        attributes: true
+    });
+}

@@ -73,11 +73,13 @@ Route::controller(CatalogoMunicipioController::class)->group(function () {
 
 Route::controller(CatalogoColoniaController::class)->group(function () {
     Route::get('catalogo/colonias', 'neighborhoods')->name('admin.catalog.neighborhoods');
+    /*
     Route::get('catalogo/colonias/agregar', 'addNeighborhood')->name('admin.catalog.neighborhood.add');
     Route::post('catalogo/colonias/store', 'storeNeighborhood')->name('admin.catalog.neighborhood.store');
     Route::get('catalogo/colonias/editar/{id}', 'editNeighborhood')->name('admin.catalog.neighborhood.edit');
     Route::put('catalogo/colonias/update/{id}', 'updateNeighborhood')->name('admin.catalog.neighborhood.update');
     Route::delete('catalogo/colonias/delete/{state_id}/{municipality_id}/{neighborhood_id}', 'deleteNeighborhood')->name('admin.catalog.neighborhood.delete');
+    */
 });
 
 Route::controller(CatalogoEstatusReporteController::class)->group(function () {
@@ -110,6 +112,7 @@ Route::controller(ReporteController::class)->group(function () {
     Route::get('reportes', 'reporteCiudadano')->name('admin.reports.all');
     Route::get('reportes/agregar', 'addReporteCiudadano')->name('admin.reports.add');
     Route::post('reportes/store', 'storeReporteCiudadano')->name('admin.reports.store');
+
     Route::get('reportes/editar/{id}', 'editReporteCiudadano')->name('admin.reports.edit');
     Route::put('reportes/update/{id}', 'updateReporteCiudadano')->name('admin.reports.update');
     Route::get('reportes/detalle/{id}', 'detailReporteCiudadano')->name('admin.reports.detail');
