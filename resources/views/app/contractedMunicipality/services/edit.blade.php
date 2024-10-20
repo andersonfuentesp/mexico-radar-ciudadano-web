@@ -61,9 +61,20 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="method"><i class="fas fa-code mr-2"></i> Método HTTP</label>
+                            <!-- Select para elegir el método HTTP -->
+                            <select name="method" class="form-control select2" required>
+                                <option value="GET" {{ $service->method == 'GET' ? 'selected' : '' }}>GET</option>
+                                <option value="POST" {{ $service->method == 'POST' ? 'selected' : '' }}>POST</option>
+                                <option value="PUT" {{ $service->method == 'PUT' ? 'selected' : '' }}>PUT</option>
+                                <option value="DELETE" {{ $service->method == 'DELETE' ? 'selected' : '' }}>DELETE</option>
+                                <option value="PATCH" {{ $service->method == 'PATCH' ? 'selected' : '' }}>PATCH</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="municipality_token"><i class="fas fa-key mr-2"></i> Token de API del Municipio (solo
                                 lectura)</label>
-                            <!-- Mostrar el token del municipio contratado -->
                             <input type="text" name="municipality_token" class="form-control"
                                 value="{{ $municipality->token }}" readonly>
                         </div>

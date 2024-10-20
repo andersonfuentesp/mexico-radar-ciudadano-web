@@ -33,6 +33,7 @@ class CommonController extends Controller
 
     public function index()
     {
+        // Datos existentes de municipios
         $municipalities = DB::table('contracted_municipalities')
             ->leftJoin('estado', 'contracted_municipalities.state_id', '=', 'estado.EstadoId')
             ->leftJoin('municipio', function ($join) {
@@ -49,23 +50,21 @@ class CommonController extends Controller
             ->orderByDesc('contracted_municipalities.created_at')
             ->get();
 
-        // Preparar datos para el gráfico de barras
+        // Datos para el gráfico de barras de municipios
         $categories = $municipalities->pluck('municipio')->toArray();
         $serviceCounts = $municipalities->pluck('services_count')->toArray();
-
-        // Datos para gráfico de barras
         $barData = json_encode([
             'categories' => $categories,
             'series' => [
                 [
                     'name' => 'Cantidad de Servicios',
                     'data' => $serviceCounts,
-                    'color' => '#4CAF50' // Color principal
+                    'color' => '#4CAF50'
                 ]
             ]
         ]);
 
-        // Datos para gráfico de pastel
+        // Datos para gráfico de pastel de municipios
         $pieData = json_encode([
             'series' => [
                 [
@@ -74,14 +73,35 @@ class CommonController extends Controller
                         return [
                             'name' => $item->municipio,
                             'y' => $item->services_count,
-                            'color' => '#' . substr(md5(rand()), 0, 6) // Colores dinámicos para cada municipio
+                            'color' => '#' . substr(md5(rand()), 0, 6)
                         ];
                     })->toArray()
                 ]
             ]
         ]);
 
-        return view('common.index', compact('barData', 'pieData'));
+        // Datos de roles y usuarios (Spatie)
+        $roles = Role::withCount('users')->get();
+        $rolesData = json_encode([
+            'series' => [
+                [
+                    'name' => 'Usuarios por Rol',
+                    'data' => $roles->map(function ($item) {
+                        return [
+                            'name' => $item->name,
+                            'y' => $item->users_count,
+                            'color' => '#' . substr(md5(rand()), 0, 6)
+                        ];
+                    })->toArray()
+                ]
+            ]
+        ]);
+
+        // Obtener la cantidad total de usuarios
+        $totalUsers = User::count();
+
+        // Devolver todos los datos al view
+        return view('common.index', compact('barData', 'pieData', 'rolesData', 'totalUsers'));
     }
 
     public function profile()

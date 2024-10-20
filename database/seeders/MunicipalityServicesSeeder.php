@@ -68,6 +68,16 @@ class MunicipalityServicesSeeder extends Seeder
 
         MunicipalityService::create([
             'municipality_id' => 1,
+            'api_url' => '/api/reportes/detail',
+            'method' => 'POST',
+            'response_format' => 'JSON',
+            'service_name' => 'Obtener datos de reporte',
+            'description' => 'Servicio para obtener datos de reporte',
+            'status' => true,
+        ]);
+
+        MunicipalityService::create([
+            'municipality_id' => 1,
             'api_url' => '/api/reporte/store',
             'method' => 'POST',
             'response_format' => 'JSON',
@@ -83,6 +93,36 @@ class MunicipalityServicesSeeder extends Seeder
             'response_format' => 'JSON',
             'service_name' => 'Listar colonias',
             'description' => 'Servicio para obtener colonias',
+            'status' => true,
+        ]);
+
+        MunicipalityService::create([
+            'municipality_id' => 1,
+            'api_url' => '/api/tipo-reporte',
+            'method' => 'GET',
+            'response_format' => 'JSON',
+            'service_name' => 'Listar tipo de reporte',
+            'description' => 'Servicio para obtener tipos de reporte',
+            'status' => true,
+        ]);
+
+        MunicipalityService::create([
+            'municipality_id' => 1,
+            'api_url' => '/api/tipo-reporte',
+            'method' => 'GET',
+            'response_format' => 'JSON',
+            'service_name' => 'Listar tipo de reporte por municipio',
+            'description' => 'Servicio para obtener tipos de reporte por municipio',
+            'status' => true,
+        ]);
+
+        MunicipalityService::create([
+            'municipality_id' => 1,
+            'api_url' => '/api/estatus-reporte',
+            'method' => 'GET',
+            'response_format' => 'JSON',
+            'service_name' => 'Listar estatus de reporte',
+            'description' => 'Servicio para obtener estatus de reporte',
             'status' => true,
         ]);
 

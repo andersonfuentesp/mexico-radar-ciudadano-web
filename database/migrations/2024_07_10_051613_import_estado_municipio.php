@@ -16,6 +16,10 @@ return new class extends Migration
     {
         $path = public_path('backend/estado_municipio.sql');
         DB::unprepared(file_get_contents($path));
+
+        // Cargar el script que inserta los datos en las tablas
+        $pathData = public_path('backend/estado_municipio_data.sql');
+        DB::unprepared(file_get_contents($pathData));
     }
 
     /**

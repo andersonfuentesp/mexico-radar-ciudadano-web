@@ -23,12 +23,17 @@ Route::controller(ApiController::class)->group(function () {
     Route::get('/noticias', 'getNoticias');
     Route::get('/tramites', 'getTramites');
     Route::get('/terms', 'getTerms');
-
     Route::get('/numeros', 'getEmergencyNumbers');
 
     // Nueva ruta para guardar el reporte
     Route::get('/report', 'getReport');
     Route::post('/save-report', 'saveReport');
+    Route::post('/report/consulta', 'reportConsulta');
+
+    Route::get('/tipo-reporte', 'getTipoReporte');
+    Route::post('/tipo-reporte-municipio', 'getTipoReporteMunicipio');
+
+    Route::post('/estatus-reporte', 'getEstatusReporte');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

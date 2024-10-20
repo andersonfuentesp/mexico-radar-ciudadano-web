@@ -101,10 +101,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Error en la conexión');
             })
             .then(data => {
+                // Mostrar el SweetAlert con opción de ver el JSON
                 Swal.fire({
                     icon: 'success',
                     title: 'Conexión Exitosa',
                     text: 'La conexión con el servicio fue exitosa.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ver Respuesta',
+                    cancelButtonText: 'Cerrar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar el JSON en el modal formateado
+                        const jsonResponse = JSON.stringify(data, null, 2); // Formato legible
+                        document.getElementById('jsonResponseContent').textContent = jsonResponse;
+                        $('#jsonResponseModal').modal('show');
+                    }
                 });
 
                 // ** Crear un archivo JSON con los datos obtenidos **
@@ -139,4 +150,116 @@ document.addEventListener('DOMContentLoaded', function () {
                 downloadLogButton.style.display = 'inline-block';
             });
     });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Copiar el contenido JSON al portapapeles
+    document.getElementById('copyJsonBtn').addEventListener('click', function () {
+        const jsonContent = document.getElementById('jsonResponseContent').textContent;
+        navigator.clipboard.writeText(jsonContent).then(function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'JSON Copiado',
+                text: 'El contenido del JSON ha sido copiado al portapapeles.',
+                timer: 2000
+            });
+        });
+    });
+
+    // Exportar JSON a CSV
+    document.getElementById('exportToCSV').addEventListener('click', function () {
+        const jsonContent = JSON.parse(document.getElementById('jsonResponseContent').textContent);
+        const csv = convertJSONToCSV(jsonContent.data); // Usamos json.data
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'response_data.csv';
+        a.click();
+    });
+
+    // Exportar JSON a XML
+    document.getElementById('exportToXML').addEventListener('click', function () {
+        const jsonContent = JSON.parse(document.getElementById('jsonResponseContent').textContent);
+        const xml = convertJSONToXML(jsonContent.data); // Usamos json.data
+        const blob = new Blob([xml], { type: 'application/xml' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'response_data.xml';
+        a.click();
+    });
+
+    // Función para convertir JSON a CSV (aplana los objetos anidados)
+    function convertJSONToCSV(json) {
+        const csvRows = [];
+        const headers = new Set(); // Conjunto para almacenar todas las llaves posibles
+
+        // Aplana las estructuras y extrae todas las llaves únicas
+        const flatData = json.map(row => flattenObject(row, '', headers));
+
+        // Crear la cabecera
+        csvRows.push([...headers].join(','));
+
+        // Crear las filas
+        flatData.forEach(flatRow => {
+            const values = [...headers].map(header => `"${flatRow[header] || ''}"`);
+            csvRows.push(values.join(','));
+        });
+
+        return csvRows.join('\n');
+    }
+
+    // Función para convertir JSON a XML
+    function convertJSONToXML(json) {
+        let xml = '<root>';
+
+        json.forEach((row, index) => {
+            xml += `<item id="${index + 1}">`;
+            xml += convertObjectToXML(row);
+            xml += '</item>';
+        });
+
+        xml += '</root>';
+        return xml;
+    }
+
+    // Aplana un objeto (convierte estructuras anidadas en una sola línea con prefijos)
+    function flattenObject(obj, parentKey = '', headers) {
+        let flatObject = {};
+
+        Object.keys(obj).forEach(key => {
+            const fullKey = parentKey ? `${parentKey}.${key}` : key;
+
+            if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                Object.assign(flatObject, flattenObject(obj[key], fullKey, headers));
+            } else {
+                flatObject[fullKey] = obj[key];
+                headers.add(fullKey); // Añadir la llave al conjunto de cabeceras
+            }
+        });
+
+        return flatObject;
+    }
+
+    // Convierte un objeto en una estructura XML, respetando los anidamientos
+    function convertObjectToXML(obj) {
+        let xml = '';
+
+        Object.keys(obj).forEach(key => {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                if (Array.isArray(obj[key])) {
+                    obj[key].forEach(item => {
+                        xml += `<${key}>${convertObjectToXML(item)}</${key}>`;
+                    });
+                } else {
+                    xml += `<${key}>${convertObjectToXML(obj[key])}</${key}>`;
+                }
+            } else {
+                xml += `<${key}>${obj[key] || ''}</${key}>`;
+            }
+        });
+
+        return xml;
+    }
 });

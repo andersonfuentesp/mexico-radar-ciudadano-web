@@ -22,11 +22,11 @@ return new class extends Migration
             $table->dateTime('report_reported_time')->nullable();
             $table->integer('state_id')->nullable(); // int(11)
             $table->integer('municipality_id')->nullable(); // int(11)
-            $table->unsignedBigInteger('dependency_id')->nullable(); // bigint(20) unsigned
-            $table->integer('neighborhood_id')->nullable(); // int(11)
-            $table->unsignedBigInteger('report_type_id')->nullable(); // bigint(20) unsigned
-            $table->integer('report_status_id')->nullable(); // int(11)
-            $table->unsignedBigInteger('response_id')->nullable(); // bigint(20) unsigned
+            //$table->unsignedBigInteger('dependency_id')->nullable(); // bigint(20) unsigned
+            // $table->integer('neighborhood_id')->nullable(); // Eliminado según solicitud
+            $table->char('report_type_id', 50)->nullable(); // Cambiado a varchar (char de longitud 36)
+            $table->char('report_status_id', 50)->nullable(); // Cambiado a varchar (char de longitud 36)
+            //$table->unsignedBigInteger('response_id')->nullable(); // bigint(20) unsigned
             $table->string('report_address', 1024)->nullable();
             $table->string('custom_report', 100)->nullable();
             $table->string('report_comment', 90)->nullable();
@@ -54,6 +54,9 @@ return new class extends Migration
             $table->tinyInteger('twitter_status')->nullable();
             $table->text('response_text')->nullable();
 
+            // Nuevo campo para indicar si el reporte es de un municipio contratado
+            $table->tinyInteger('is_contracted_municipality')->default(0); // 0 = No, 1 = Sí
+
             // Campos adicionales para reportes desde el celular
             $table->string('mobile_model', 100)->nullable();  // Modelo del dispositivo móvil
             $table->string('os_version', 50)->nullable();     // Versión del sistema operativo
@@ -68,8 +71,7 @@ return new class extends Migration
             // Foreign keys (only necessary ones)
             $table->foreign('state_id', 'fk_reports_state')->references('EstadoId')->on('estado')->onDelete('cascade');
             $table->foreign(['state_id', 'municipality_id'], 'fk_reports_municipality')->references(['EstadoId', 'MunicipioId'])->on('municipio')->onDelete('cascade');
-            $table->foreign('report_type_id', 'fk_reports_report_type')->references('ReportTypeId')->on('report_types')->onDelete('cascade');
-            $table->foreign('report_status_id', 'fk_reports_status')->references('report_status_id')->on('report_statuses')->onDelete('cascade');
+            // Eliminamos las claves foráneas de `report_type_id` y `report_status_id`
         });
     }
 

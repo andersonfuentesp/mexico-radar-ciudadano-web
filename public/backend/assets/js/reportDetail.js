@@ -19,22 +19,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Mejor diseño más compacto para el contenido del infowindow
         const contentString = `
-            <div class="infowindow-content" style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-                <h4 style="margin-top: 0; font-size: 16px; font-weight: bold; color: #555;">Detalles del Reporte</h4>
-                <p><span style="font-weight: bold; color: #555;">Folio:</span> ${reportFolio}</p>
-                <p><span style="font-weight: bold; color: #555;">Estado:</span> ${estadoNombre}</p>
-                <p><span style="font-weight: bold; color: #555;">Municipio:</span> ${municipioNombre}</p>
-                <p><span style="font-weight: bold; color: #555;">Colonia:</span> ${colonia}</p>
-                <p><span style="font-weight: bold; color: #555;">Tipo de Reporte:</span> ${reportTypeName}</p>
-                <p><span style="font-weight: bold; color: #555;">Dirección:</span> ${reportAddress}</p>
-                <p><span style="font-weight: bold; color: #555;">Fecha del Reporte:</span> ${fechaReporte}</p>
+            <div class="infowindow-content" style="font-family: Arial, sans-serif; font-size: 13px; color: #333; line-height: 1.4;">
+                <h4 style="margin: 0; font-size: 15px; font-weight: bold; color: #333;">Detalles del Reporte</h4>
+                <p style="margin: 2px 0;"><strong>Folio:</strong> ${reportFolio}</p>
+                <p style="margin: 2px 0;"><strong>Estado:</strong> ${estadoNombre}</p>
+                <p style="margin: 2px 0;"><strong>Municipio:</strong> ${municipioNombre}</p>
+                <p style="margin: 2px 0;"><strong>Colonia:</strong> ${colonia}</p>
+                <p style="margin: 2px 0;"><strong>Tipo de Reporte:</strong> ${reportTypeName}</p>
+                <p style="margin: 2px 0;"><strong>Dirección:</strong> ${reportAddress}</p>
+                <p style="margin: 2px 0;"><strong>Fecha del Reporte:</strong> ${fechaReporte}</p>
             </div>
         `;
 
         const infowindow = new google.maps.InfoWindow({
             content: contentString,
-            maxWidth: 300
+            maxWidth: 280 // Ajustar el ancho máximo para que sea más compacto
         });
 
         const marker = new google.maps.Marker({

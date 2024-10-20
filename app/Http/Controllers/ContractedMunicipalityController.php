@@ -165,7 +165,7 @@ class ContractedMunicipalityController extends Controller
             'token' => 'nullable|string|max:255', // Validación del token (opcional)
         ]);
 
-        $id= decrypt($id);
+        $id = decrypt($id);
 
         // Buscar el municipio contratado por ID
         $data = ContractedMunicipality::findOrFail($id);
@@ -320,7 +320,7 @@ class ContractedMunicipalityController extends Controller
         $request->validate([
             'service_name' => 'required|string|max:255',
             'api_url' => 'required|string',  // Validamos el segmento adicional de la URL
-            'api_token' => 'nullable|string|max:255',
+            'method' => 'required|string|in:GET,POST,PUT,DELETE,PATCH', // Validación del método HTTP
             'response_format' => 'required|in:JSON,XML,CSV,Other',
             'status' => 'boolean',
         ]);
@@ -333,7 +333,7 @@ class ContractedMunicipalityController extends Controller
         $service = MunicipalityService::findOrFail($decryptedServiceId);
         $service->service_name = $request->service_name;
         $service->api_url = $request->api_url;  // Aquí se actualiza solo el segmento de la URL
-        //$service->api_token = $request->api_token;
+        $service->method = $request->method; // Actualizar el método HTTP
         $service->response_format = $request->response_format;
         $service->description = $request->description;
         $service->status = $request->status ?? true;

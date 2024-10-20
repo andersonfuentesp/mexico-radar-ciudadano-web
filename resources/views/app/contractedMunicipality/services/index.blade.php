@@ -24,13 +24,21 @@
 
 @section('content')
     <div class="card">
-        <div class="card-header">
-            @can('admin.contractedMunicipality.services.add')
-                <a href="{{ route('admin.contractedMunicipality.services.add', encrypt($municipality->id)) }}"
-                    class="btn btn-custom btn-rounded waves-effect waves-light">
-                    <i class="fas fa-plus"></i> Agregar Nuevo Servicio
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                @can('admin.contractedMunicipality.services.add')
+                    <a href="{{ route('admin.contractedMunicipality.services.add', encrypt($municipality->id)) }}"
+                        class="btn btn-custom btn-rounded waves-effect waves-light">
+                        <i class="fas fa-plus"></i> Agregar Nuevo Servicio
+                    </a>
+                @endcan
+            </div>
+            <!-- URL del Municipio en un badge al lado del botón -->
+            <div>
+                <a href="{{ rtrim($municipality->url, '/') }}" class="btn btn-outline-info" target="_blank">
+                    <i class="fas fa-link"></i> {{ rtrim($municipality->url, '/') }}
                 </a>
-            @endcan
+            </div>
         </div>
 
         <div class="card-body">
@@ -53,7 +61,10 @@
                         <tr>
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $service->service_name }}</td>
-                            <td>{{ rtrim($municipality->url, '/') . '/' . ltrim($service->api_url, '/') }}</td>
+                            <!-- Mostrar solo api_url en un badge -->
+                            <td>
+                                <span class="badge badge-info">{{ $service->api_url }}</span>
+                            </td>
                             <td>{{ $service->method }}</td>
                             <td>{{ $service->response_format }}</td>
                             <td>
@@ -112,7 +123,6 @@
         </div>
     </div>
 
-    <!-- Incluir el modal desde otro Blade -->
     @include('partials.service-modal')
 @stop
 

@@ -110,12 +110,14 @@ Route::controller(ContractedMunicipalityController::class)->group(function () {
 
 Route::controller(ReporteController::class)->group(function () {
     Route::get('reportes', 'reporteCiudadano')->name('admin.reports.all');
+    Route::get('reportes/detalle/{report_id}/{state_id}/{municipality_id}', 'detailReporteCiudadano')
+        ->name('admin.reports.detail');
+
     Route::get('reportes/agregar', 'addReporteCiudadano')->name('admin.reports.add');
     Route::post('reportes/store', 'storeReporteCiudadano')->name('admin.reports.store');
 
     Route::get('reportes/editar/{id}', 'editReporteCiudadano')->name('admin.reports.edit');
     Route::put('reportes/update/{id}', 'updateReporteCiudadano')->name('admin.reports.update');
-    Route::get('reportes/detalle/{id}', 'detailReporteCiudadano')->name('admin.reports.detail');
     Route::delete('reportes/delete/{id}', 'deleteReporteCiudadano')->name('admin.reports.delete');
 });
 
