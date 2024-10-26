@@ -430,13 +430,14 @@ return [
                     'can'    => 'admin.reports.all',
                     'icon'   => 'fas fa-list-alt', // Icono para listar reportes
                 ],
+                /*
                 [
                     'text'   => 'Agregar reporte',
                     'route'  => 'admin.reports.add',
                     'active' => ['app/reportes/agregar'],
                     'can'    => 'admin.reports.add',
                     'icon'   => 'fas fa-plus-circle', // Icono para agregar nuevo reporte
-                ],
+                ],*/
             ],
         ],
         

@@ -38,6 +38,49 @@ class LocationHelper
         return ['error' => 'Error al obtener la dirección detallada.'];
     }
 
+    public static function obtenerDireccionCompleta($latitude, $longitude)
+    {
+        $reverseGeocodeApiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
+        $reverseParams = [
+            'latlng' => "{$latitude},{$longitude}",
+            'key' => config('services.google.maps_api_key'),
+        ];
+
+        // Realizar la solicitud a la API de Google
+        $response = Http::get($reverseGeocodeApiUrl, $reverseParams);
+
+        if ($response->successful()) {
+            $addressComponents = $response->json()['results'][0]['address_components'];
+            $formattedAddress = $response->json()['results'][0]['formatted_address'];
+
+            $colonia = '';
+            $codigoPostal = '';
+
+            // Extraer colonia y código postal
+            foreach ($addressComponents as $component) {
+                if (in_array('sublocality_level_1', $component['types'])) {
+                    $colonia = $component['long_name'];
+                }
+                if (in_array('postal_code', $component['types'])) {
+                    $codigoPostal = $component['long_name'];
+                }
+            }
+
+            // Concatenar los valores en un string
+            $direccionCompleta = $formattedAddress;
+            if ($colonia) {
+                $direccionCompleta .= ', Colonia ' . $colonia;
+            }
+            if ($codigoPostal) {
+                $direccionCompleta .= ', Código Postal ' . $codigoPostal;
+            }
+
+            return $direccionCompleta;
+        }
+
+        return 'Error al obtener la dirección detallada.';
+    }
+
     public static function convertPolygonToLatLng($polygon)
     {
         $coordinates = [];

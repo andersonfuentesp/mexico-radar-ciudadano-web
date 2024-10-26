@@ -31,42 +31,54 @@
                 <div>
                     <form action="{{ route('admin.reports.all') }}" method="GET" class="form-inline">
                         <div class="form-row align-items-center custom-form-row">
+                            <!-- Estado -->
                             <div class="col-auto" style="width: 230px;">
-                                <select name="state_id" id="StateId" class="form-control select2" required>
+                                <select name="estado_id" id="StateId" class="form-control select2" required>
                                     <option value="">Seleccione un estado</option>
                                     @foreach ($states as $state)
                                         <option value="{{ $state->EstadoId }}"
-                                            {{ request()->get('state_id') == $state->EstadoId ? 'selected' : '' }}>
+                                            {{ request()->get('estado_id') == $state->EstadoId ? 'selected' : '' }}>
                                             {{ $state->EstadoNombre }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
+                            <!-- Municipio -->
                             <div class="col-auto" style="width: 250px;">
                                 <select name="municipio_id" id="MunicipalityId" class="form-control select2" required>
                                     <option value="">Seleccione un municipio</option>
-                                    <!-- Los municipios se cargarán dinámicamente -->
+                                    @if (!empty($municipios))
+                                        @foreach ($municipios as $municipio)
+                                            <option value="{{ $municipio->MunicipioId }}"
+                                                {{ request()->get('municipio_id') == $municipio->MunicipioId ? 'selected' : '' }}>
+                                                {{ $municipio->MunicipioNombre }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
+                            <!-- Tipo de reporte -->
                             <div class="col-auto">
                                 <select name="report_type" id="report_type" class="form-control">
                                     <option value="">Selecciona Tipo de Reporte</option>
-                                    @foreach ($reportTypes as $name)
-                                        <option value="{{ $name }}"
-                                            {{ request()->get('report_type') == $name ? 'selected' : '' }}>
-                                            {{ $name }}
+                                    @foreach ($reportTypes as $type)
+                                        <option value="{{ $type }}"
+                                            {{ request()->get('report_type') == $type ? 'selected' : '' }}>
+                                            {{ $type }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
+                            <!-- Fechas -->
                             <div class="col-auto">
-                                <input type="date" name="search_start" id="search_start"
-                                    class="form-control" value="{{ request()->get('search_start') }}">
+                                <input type="date" name="search_start" id="search_start" class="form-control"
+                                    value="{{ request()->get('search_start') }}">
                             </div>
                             <div class="col-auto">
-                                <input type="date" name="search_end" id="search_end"
-                                    class="form-control" value="{{ request()->get('search_end') }}">
+                                <input type="date" name="search_end" id="search_end" class="form-control"
+                                    value="{{ request()->get('search_end') }}">
                             </div>
+                            <!-- Estatus -->
                             <div class="col-auto">
                                 <select name="search_status_name" id="search_status_name" class="form-control">
                                     <option value="">Selecciona Estatus</option>
@@ -78,8 +90,8 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <!-- Contratado -->
                             <div class="col-auto">
-                                <!-- Nuevo selector para el estado de "Contratado" -->
                                 <select name="contratado" id="contratado" class="form-control">
                                     <option value="">¿Contratado?</option>
                                     <option value="1" {{ request()->get('contratado') == '1' ? 'selected' : '' }}>Sí
@@ -88,6 +100,7 @@
                                     </option>
                                 </select>
                             </div>
+                            <!-- Botón de búsqueda -->
                             <div class="col-auto">
                                 <button type="submit" class="btn btn-custom mb-2"><i class="fas fa-search"></i>
                                     Buscar</button>
@@ -106,13 +119,13 @@
                         <th>Estado</th>
                         <th>Municipio</th>
                         <th>Tipo de Reporte</th>
-                        <th>Colonia</th>
                         <th>Dirección</th>
                         <th>Comentario</th>
                         <th>Estatus</th>
                         <th>Fecha de Registro</th>
-                        <th>URL</th>
-                        <th>¿Contratado?</th> <!-- Nueva columna para mostrar si está contratado -->
+                        <th>URL Municipio</th>
+                        <th>¿Contratado?</th>
+                        <th>Origen</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -120,19 +133,29 @@
                     @foreach ($reports as $key => $report)
                         <tr>
                             <td>{{ ($reports->currentPage() - 1) * $reports->perPage() + $key + 1 }}</td>
-                            <td>{{ $report['report_id'] }}</td>
-                            <td>{{ $report['EstadoNombre'] }}</td>
-                            <td>{{ $report['MunicipioNombre'] }}</td>
-                            <td>{{ $report['report_type'] }}</td>
-                            <td>{{ $report['neighborhood_name'] }}</td>
-                            <td>{!! $report['report_address'] !!}</td>
-                            <td>{!! $report['report_comment'] !!}</td>
-                            <td><span class="badge badge-dark">{{ $report['report_status'] }}</span></td>
-                            <td>{{ \Carbon\Carbon::parse($report['created_at'])->format('d/m/Y H:i') }}</td>
-
+                            <td>{{ $report->report_id }}</td>
+                            <td>{{ $report->EstadoNombre }}</td>
+                            <td>{{ $report->MunicipioNombre }}</td>
+                            <td>{{ $report->report_type_id }}</td>
+                            <td>{{ $report->report_address }}</td>
+                            <td>{{ $report->report_comment }}</td>
+                            <!-- Estatus con badge -->
                             <td>
-                                @if ($report['municipality_url'])
-                                    <a href="{{ $report['municipality_url'] }}" class="btn btn-warning" target="_blank"
+                                @if ($report->report_status_id == 'Completado')
+                                    <span class="badge badge-success">{{ $report->report_status_id }}</span>
+                                @elseif ($report->report_status_id == 'Pendiente')
+                                    <span class="badge badge-warning">{{ $report->report_status_id }}</span>
+                                @elseif ($report->report_status_id == 'En Proceso')
+                                    <span class="badge badge-info">{{ $report->report_status_id }}</span>
+                                @else
+                                    <span class="badge badge-secondary">{{ $report->report_status_id }}</span>
+                                @endif
+                            </td>
+                            <td>{{ \Carbon\Carbon::parse($report->report_registration_time)->format('d/m/Y H:i') }}</td>
+                            <!-- Columna con URL del municipio -->
+                            <td>
+                                @if ($report->municipality_url)
+                                    <a href="{{ $report->municipality_url }}" class="btn btn-warning" target="_blank"
                                         title="Ir al sitio">
                                         <i class="fas fa-external-link-alt"></i>
                                     </a>
@@ -140,27 +163,24 @@
                                     <span class="text-muted">No disponible</span>
                                 @endif
                             </td>
-
                             <td>
-                                <!-- Columna que muestra si es contratado con badge de color -->
-                                @if ($report['is_contracted'] === 'Sí')
+                                @if ($report->is_contracted_municipality)
                                     <span class="badge badge-success">Sí</span>
                                 @else
                                     <span class="badge badge-danger">No</span>
                                 @endif
                             </td>
-
+                            <td>{{ $report->generated_from ?? 'No especificado' }}</td>
                             <td>
-                                @can('admin.reports.detail')
-                                    <a href="{{ route('admin.reports.detail', [
-                                        'report_id' => encrypt($report['report_id']),
-                                        'state_id' => encrypt($report['state_id']),
-                                        'municipality_id' => encrypt($report['municipality_id']),
-                                    ]) }}"
-                                        class="btn btn-info sm" title="Ver Detalles">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                @endcan
+                                <!-- Enlace a la ruta de detalle con encriptación -->
+                                <a href="{{ route('admin.reports.detail', [
+                                    'report_id' => encrypt($report->report_id),
+                                    'state_id' => encrypt($report->state_id),
+                                    'municipality_id' => encrypt($report->municipality_id),
+                                ]) }}"
+                                    class="btn btn-info sm" title="Ver Detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                             </td>
                         </tr>
                     @endforeach

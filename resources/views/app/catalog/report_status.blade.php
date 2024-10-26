@@ -43,13 +43,19 @@
                             <td>{{ $status->report_status_name }}</td>
                             <td>{{ \Carbon\Carbon::parse($status->created_at)->format('d/m/Y H:i') }}</td>
                             <td>
-                                <form action="{{ route('admin.catalog.report.status.delete', $status->report_status_id) }}" method="POST" class="d-inline delete-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger sm delete-button" title="Eliminar">
+                                @if (in_array($status->report_status_id, [1, 2, 3, 4]))
+                                    <button class="btn btn-danger sm delete-button" title="Eliminar" disabled>
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                </form>
+                                @else
+                                    <form action="{{ route('admin.catalog.report.status.delete', $status->report_status_id) }}" method="POST" class="d-inline delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger sm delete-button" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

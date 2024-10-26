@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('custom_report', 100)->nullable();
             $table->string('report_comment', 90)->nullable();
             $table->char('gps_location', 50)->nullable();
-            $table->mediumText('geospatial_location')->nullable();
+            $table->point('geospatial_location')->nullable(); 
             $table->date('end_date')->nullable();
             $table->dateTime('end_time')->nullable();
             $table->string('end_comment', 500)->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
             $table->string('block_user', 100)->nullable();
             $table->string('email', 100)->nullable();
             $table->char('phone', 20)->nullable();
-            $table->text('reported_photo');
+            $table->text('reported_photo')->nullable();
             $table->string('reported_photo_gxi', 2048)->nullable();
             $table->char('status_sd', 10)->nullable();
             $table->char('status_list_sd', 10)->nullable();
@@ -65,6 +65,7 @@ return new class extends Migration
             $table->text('attachments')->nullable();          // Archivos adjuntos como fotos adicionales
             $table->string('network_type', 20)->nullable();   // Tipo de red al enviar (Wi-Fi, 4G, etc.)
             $table->string('imei', 20)->nullable();           // IMEI del dispositivo móvil
+            $table->string('generated_from')->nullable();
 
             $table->timestamps();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Reporte;
 
 use App\Http\Controllers\Controller;
 use App\Models\Estado;
+use App\Models\Municipio;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,173 @@ class ReporteController extends Controller
     }
 
     public function reporteCiudadano(Request $request)
+    {
+        // Obtener todos los estados
+        $states = Estado::all();
+        $municipios = [];
+
+        // Obtener tipos de reporte desde el servicio "Listar tipo de reporte"
+        $reportTypes = [];
+
+        try {
+            // Consultar los municipios que tienen el servicio "Listar tipo de reporte"
+            $municipalitiesForReportTypes = DB::table('contracted_municipalities')
+                ->leftJoin('municipality_services', 'contracted_municipalities.id', '=', 'municipality_services.municipality_id')
+                ->where('municipality_services.service_name', 'Listar tipo de reporte')
+                ->select('contracted_municipalities.url as municipality_url', 'contracted_municipalities.token', 'municipality_services.api_url as service_url', 'municipality_services.method')
+                ->get();
+
+            foreach ($municipalitiesForReportTypes as $municipality) {
+                $apiUrl = rtrim($municipality->municipality_url, '/') . '/' . ltrim($municipality->service_url, '/');
+                $headers = [
+                    'Authorization' => 'Bearer ' . $municipality->token,
+                    'Content-Type' => 'application/json',
+                ];
+
+                $response = strtoupper($municipality->method) === 'POST'
+                    ? Http::withHeaders($headers)->post($apiUrl)
+                    : Http::withHeaders($headers)->get($apiUrl);
+
+                if ($response->successful()) {
+                    $responseData = $response->json();
+                    if (isset($responseData['data'])) {
+                        foreach ($responseData['data'] as $reportType) {
+                            $reportTypes[] = $reportType['ReportTypeName'];
+                        }
+                    }
+                }
+            }
+
+            $reportTypes = array_unique($reportTypes);
+        } catch (\Exception $e) {
+            // Si ocurre un error, obtener los tipos de reporte desde la base de datos
+            $reportTypes = DB::table('report_types')
+                ->where('ReportTypeIsActive', true)
+                ->orderBy('ReportTypeOrderPriority')
+                ->pluck('ReportTypeName')
+                ->toArray();
+        }
+
+        // Obtener estatus de reporte desde el servicio "Listar estatus de reporte"
+        $reportStatuses = [];
+
+        try {
+            $municipalitiesForReportStatuses = DB::table('contracted_municipalities')
+                ->leftJoin('municipality_services', 'contracted_municipalities.id', '=', 'municipality_services.municipality_id')
+                ->where('municipality_services.service_name', 'Listar estatus de reporte')
+                ->select('contracted_municipalities.url as municipality_url', 'contracted_municipalities.token', 'municipality_services.api_url as service_url', 'municipality_services.method')
+                ->get();
+
+            foreach ($municipalitiesForReportStatuses as $municipality) {
+                $apiUrl = rtrim($municipality->municipality_url, '/') . '/' . ltrim($municipality->service_url, '/');
+                $headers = [
+                    'Authorization' => 'Bearer ' . $municipality->token,
+                    'Content-Type' => 'application/json',
+                ];
+
+                $response = strtoupper($municipality->method) === 'POST'
+                    ? Http::withHeaders($headers)->post($apiUrl)
+                    : Http::withHeaders($headers)->get($apiUrl);
+
+                if ($response->successful()) {
+                    $responseData = $response->json();
+                    if (isset($responseData['data'])) {
+                        foreach ($responseData['data'] as $reportStatus) {
+                            $reportStatuses[] = $reportStatus['report_status_name'];
+                        }
+                    }
+                }
+            }
+
+            $reportStatuses = array_unique($reportStatuses);
+        } catch (\Exception $e) {
+            // Si ocurre un error, obtener los estatus de reporte desde la base de datos
+            $reportStatuses = DB::table('report_statuses')
+                ->pluck('report_status_name')
+                ->toArray();
+        }
+
+        // Construir la consulta base de reportes
+        $reportsQuery = DB::table('reports')
+            ->leftJoin('estado', 'reports.state_id', '=', 'estado.EstadoId')
+            ->leftJoin('municipio', function ($join) {
+                $join->on('reports.state_id', '=', 'municipio.EstadoId')
+                    ->on('reports.municipality_id', '=', 'municipio.MunicipioId');
+            })
+            ->leftJoin('contracted_municipalities', function ($join) {
+                $join->on('reports.state_id', '=', 'contracted_municipalities.state_id')
+                    ->on('reports.municipality_id', '=', 'contracted_municipalities.municipality_id');
+            })
+            ->select(
+                'reports.report_id',
+                'reports.report_folio',
+                'reports.state_id',
+                'reports.municipality_id',
+                'reports.report_registration_date',
+                'reports.report_registration_time',
+                'reports.report_type_id',
+                'reports.report_status_id',
+                'reports.report_address',
+                'reports.report_comment',
+                'reports.created_at',
+                'reports.is_contracted_municipality',
+                'estado.EstadoNombre',
+                'municipio.MunicipioNombre',
+                'contracted_municipalities.url as municipality_url'
+            );
+
+        if ($request->filled('estado_id')) {
+            $reportsQuery->where('reports.state_id', $request->estado_id);
+            $municipios = Municipio::where('EstadoId', $request->estado_id)->get();
+        }
+
+        if ($request->filled('municipio_id')) {
+            $reportsQuery->where('reports.municipality_id', $request->municipio_id);
+        }
+
+        if ($request->filled('report_type')) {
+            $reportsQuery->where('reports.report_type_id', $request->report_type);
+        }
+
+        if ($request->filled('search_status_name')) {
+            $reportsQuery->where('reports.report_status_id', $request->search_status_name);
+        }
+
+        if ($request->filled('search_start') && $request->filled('search_end')) {
+            $reportsQuery->whereBetween('reports.report_registration_time', [$request->search_start, $request->search_end]);
+        }
+
+        if ($request->filled('contratado')) {
+            $reportsQuery->where('reports.is_contracted_municipality', $request->contratado);
+        }
+
+        $reports = $reportsQuery->paginate(100);
+
+        if ($request->filled('estado_id') && $request->filled('municipio_id') && $reports->isEmpty()) {
+            $isContracted = DB::table('contracted_municipalities')
+                ->where('state_id', $request->estado_id)
+                ->where('municipality_id', $request->municipio_id)
+                ->exists();
+
+            if (!$isContracted) {
+                $notification = [
+                    'message' => 'Municipio no está contratado, no se encontraron reportes.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->back()->with($notification);
+            }
+        }
+
+        return view('app.reports.index', [
+            'reports' => $reports,
+            'states' => $states,
+            'municipios' => $municipios,
+            'reportTypes' => $reportTypes,
+            'reportStatuses' => $reportStatuses,
+        ]);
+    }
+
+    public function reporteCiudadanoOld(Request $request)
     {
         // Obtener tipos de reporte desde el servicio "Listar tipo de reporte"
         $reportTypes = [];
@@ -103,11 +271,14 @@ class ReporteController extends Controller
         $reportStatuses = array_unique($reportStatuses);
         // Obtener todos los estados
         $states = Estado::all();
+        $municipios = [];
 
         //######### Opción 1: En caso se reciba del grid de búsqueda
 
         // Verificar si el request tiene los filtros de búsqueda del grid (estado_id y municipio_id)
         if ($request->has('estado_id') && $request->has('municipio_id')) {
+            $municipios = Municipio::where('EstadoId', $request->estado_id)->get();
+
             // Si los filtros están presentes, buscar el municipio contratado que tiene el servicio "Listar reportes"
             $municipality = DB::table('contracted_municipalities')
                 ->leftJoin('estado', 'contracted_municipalities.state_id', '=', 'estado.EstadoId')
@@ -134,7 +305,11 @@ class ReporteController extends Controller
 
             // Verificar si el municipio fue encontrado
             if (!$municipality) {
-                return response()->json(['error' => 'Municipio no encontrado o no tiene el servicio "Listar reportes"'], 404);
+                $notification = [
+                    'message' => 'Municipio contratado no encontrado o no tiene el servicio "Listar reportes".',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->back()->with($notification);
             }
 
             // Realizar la petición al servicio externo del municipio
@@ -153,6 +328,7 @@ class ReporteController extends Controller
                 'search_start' => $request->search_start,
                 'search_end' => $request->search_end,
                 'search_status_name' => $request->search_status_name,
+                'report_type' => $request->report_type,
             ];
 
             // Realizar la solicitud HTTP (GET o POST)
@@ -212,10 +388,15 @@ class ReporteController extends Controller
                     'reportTypes' => $reportTypes, // No necesitamos los tipos de reporte aquí
                     'reportStatuses' => $reportStatuses, // No necesitamos los estatus aquí
                     'states' => $states,
+                    'municipios' => $municipios,
                 ]);
             } else {
-                // Si la respuesta no fue exitosa, manejar el error
-                return response()->json(['error' => 'No se pudo obtener la información de los reportes'], $response->status());
+                // Si la respuesta no fue exitosa, manejar el error con una notificación
+                $notification = [
+                    'message' => 'No se pudo obtener la información de los reportes.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->back()->with($notification);
             }
         }
 
@@ -323,6 +504,7 @@ class ReporteController extends Controller
             'reportTypes' => $reportTypes, // Tipos de reporte obtenidos desde el servicio sin duplicados
             'reportStatuses' => $reportStatuses, // Estatus de reporte obtenidos desde el servicio sin duplicados
             'states' => $states,
+            'municipios' => $municipios,
         ]);
     }
 

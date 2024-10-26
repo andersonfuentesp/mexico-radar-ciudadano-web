@@ -28,6 +28,9 @@ Route::controller(ApiController::class)->group(function () {
     // Nueva ruta para guardar el reporte
     Route::get('/report', 'getReport');
     Route::post('/save-report', 'saveReport');
+    Route::post('/save-simple-report', 'saveSimpleReport');
+
+    Route::post('/update-report', 'updateReport');
     Route::post('/report/consulta', 'reportConsulta');
 
     Route::get('/tipo-reporte', 'getTipoReporte');

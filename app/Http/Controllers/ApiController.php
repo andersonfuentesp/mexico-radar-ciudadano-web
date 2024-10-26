@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ImageHelper;
+use App\Helpers\LocationHelper;
 use Illuminate\Http\Request;
 use App\Models\Estado;
 use App\Models\Municipio;
@@ -506,12 +507,14 @@ class ApiController extends Controller
     public function saveReport(Request $request)
     {
         try {
+            Log::info('Datos del request:', $request->all());
+
             // Validación de los datos
             $validated = $request->validate([
                 'latitude' => 'required|numeric',
                 'longitude' => 'required|numeric',
                 'report_type' => 'required|string|max:50',
-                'address' => 'nullable|string|max:1024',
+                //'address' => 'nullable|string|max:1024',
                 'comment' => 'nullable|string|max:90',
                 'phone' => 'nullable|string|max:20',
                 'email' => 'nullable|string|email|max:100',
@@ -527,155 +530,270 @@ class ApiController extends Controller
                 'imei' => 'nullable|string|max:20',
             ]);
 
-            // Consulta del polígono
-            $municipioPol = DB::table('MunicipioPol')
-                ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
-                ->first();
-
-            if (!$municipioPol) {
-                return response()->json(['error' => 'No municipality found for the provided coordinates'], 404);
+            // Obtener la dirección usando las coordenadas si no se ha proporcionado
+            if (empty($validated['address'])) {
+                $validated['address'] = LocationHelper::obtenerDireccionCompleta($validated['latitude'], $validated['longitude']);
             }
 
-            // Buscar en la tabla contracted_municipalities
-            $contractedMunicipality = DB::table('contracted_municipalities')
-                ->where('state_id', $municipioPol->EstadoPolId)
-                ->where('municipality_id', $municipioPol->MunicipioPolId)
-                ->first();
+            // Transacción para asegurar la concurrencia
+            DB::transaction(function () use ($validated, $request) {
 
-            // Generar el report_id internamente
-            $generatedReportId = Str::uuid();
+                // Consulta del polígono
+                $municipioPol = DB::table('MunicipioPol')
+                    ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
+                    ->first();
 
-            // Usar ImageHelper para almacenar imágenes
-            $reportedPhotoPath = $request->hasFile('reported_photo')
-                ? ImageHelper::storeImage($request->file('reported_photo'), 'reports')
-                : null;
+                if (!$municipioPol) {
+                    throw new \Exception('No municipality found for the provided coordinates', 404);
+                }
 
-            $endPhotoPath = $request->hasFile('end_photo')
-                ? ImageHelper::storeImage($request->file('end_photo'), 'reports')
-                : null;
+                // Buscar en la tabla contracted_municipalities
+                $contractedMunicipality = DB::table('contracted_municipalities')
+                    ->where('state_id', $municipioPol->EstadoPolId)
+                    ->where('municipality_id', $municipioPol->MunicipioPolId)
+                    ->first();
 
-            // Usar ImageHelper para almacenar los attachments si existen
-            $attachmentData = $request->hasFile('attachments')
-                ? ImageHelper::storeFile($request->file('attachments'), 'reports')
-                : null;
+                // Generar el report_id internamente
+                $generatedReportId = Str::uuid();
 
-            // Registrar el reporte en la tabla `reports` del proyecto 1 SIEMPRE
-            $report = DB::table('reports')->insert([
-                'report_id' => $generatedReportId,
-                'report_folio' => rand(100000, 999999),
-                'report_registration_date' => now()->format('Y-m-d'),
-                'report_registration_time' => now()->format('Y-m-d H:i:s'),
-                'state_id' => $municipioPol->EstadoPolId,
-                'municipality_id' => $municipioPol->MunicipioPolId,
-                'report_type_id' => $validated['report_type'],
-                'report_status_id' => '1',
-                'report_address' => $validated['address'],
-                'custom_report' => $validated['report_type'],
-                'report_comment' => $validated['comment'],
-                'gps_location' => $validated['gps_location'],
-                'geospatial_location' => DB::raw("ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326)"),
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'is_contracted_municipality' => $contractedMunicipality ? 1 : 0,
-                'mobile_model' => $validated['mobile_model'],
-                'os_version' => $validated['os_version'],
-                'app_version' => $validated['app_version'],
-                'is_offline' => $validated['is_offline'],
-                'network_type' => $validated['network_type'],
-                'imei' => $validated['imei'],
-                'reported_photo' => $reportedPhotoPath,
-                'end_photo' => $endPhotoPath,
-                'attachments' => $attachmentData ? json_encode($attachmentData) : null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                // Obtener el último folio de la tabla `reports` y sumarle 1
+                $lastFolio = DB::table('reports')->max('report_folio');
+                $newFolio = $lastFolio ? $lastFolio + 1 : 100000; // Comenzar desde 100000 si no hay registros
 
-            // Si no es un municipio contratado, devolver respuesta sin hacer el request al proyecto 2
-            if (!$contractedMunicipality) {
-                return response()->json([
-                    'message' => 'Report successfully registered, but does not belong to a contracted municipality',
-                ], 201);
-            }
+                // Usar ImageHelper para almacenar imágenes
+                $reportedPhotoPath = $request->hasFile('reported_photo')
+                    ? ImageHelper::storeImage($request->file('reported_photo'), 'reports')
+                    : null;
 
-            // Buscar en la tabla municipality_services filtrando por service_name = 'Ingresar reporte'
-            $municipalityService = DB::table('municipality_services')
-                ->where('municipality_id', $contractedMunicipality->id)
-                ->where('service_name', 'Ingresar reporte')
-                ->first();
+                $endPhotoPath = $request->hasFile('end_photo')
+                    ? ImageHelper::storeImage($request->file('end_photo'), 'reports')
+                    : null;
 
-            if (!$municipalityService) {
-                return response()->json(['error' => 'No service found to submit the report in the municipality'], 404);
-            }
+                $attachmentData = $request->hasFile('attachments')
+                    ? ImageHelper::storeFile($request->file('attachments'), 'reports')
+                    : null;
 
-            // Concatenar la URL base del municipio con la API URL del servicio
-            $apiUrl = rtrim($contractedMunicipality->url, '/') . '/' . ltrim($municipalityService->api_url, '/');
-
-            // Preparar los headers con el token
-            $headers = [
-                'Authorization' => 'Bearer ' . $contractedMunicipality->token,
-                'Content-Type' => 'application/json',
-            ];
-
-            // Realizar la solicitud HTTP POST a la URL concatenada, incluyendo el report_id generado
-            $response = Http::withHeaders($headers);
-
-            // Solo adjuntar 'reported_photo' si está presente en la solicitud
-            if ($request->hasFile('reported_photo')) {
-                $response = $response->attach(
-                    'reported_photo',
-                    $request->file('reported_photo'),
-                    $request->file('reported_photo')->getClientOriginalName()
-                );
-            }
-
-            // Solo adjuntar 'end_photo' si está presente en la solicitud
-            if ($request->hasFile('end_photo')) {
-                $response = $response->attach(
-                    'end_photo',
-                    $request->file('end_photo'),
-                    $request->file('end_photo')->getClientOriginalName()
-                );
-            }
-
-            // Solo adjuntar 'attachments' si está presente en la solicitud
-            if ($request->hasFile('attachments')) {
-                $response = $response->attach(
-                    'attachments',
-                    $request->file('attachments'),
-                    $request->file('attachments')->getClientOriginalName()
-                );
-            }
-
-            // Realizar la solicitud HTTP POST
-            $response = $response->post($apiUrl, [
-                'report_id' => $generatedReportId,
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
-                'state' => $municipioPol->EstadoPolId,
-                'municipality' => $municipioPol->MunicipioPolId,
-                'report_type' => $validated['report_type'],
-                'address' => $validated['address'],
-                'comment' => $validated['comment'],
-                'phone' => $validated['phone'],
-                'email' => $validated['email'],
-                'gps_location' => $validated['gps_location'],
-            ]);
-
-            // Devolver la respuesta de la solicitud HTTP
-            if ($response->successful()) {
-                return response()->json([
-                    'message' => 'Report successfully submitted',
-                    'data' => $response->json(),
+                // Registrar el reporte en la tabla `reports` del proyecto 1
+                DB::table('reports')->insert([
+                    'report_id' => $generatedReportId,
+                    'report_folio' => $newFolio,
+                    'report_registration_date' => now()->format('Y-m-d'),
+                    'report_registration_time' => now()->format('Y-m-d H:i:s'),
+                    'state_id' => $municipioPol->EstadoPolId,
+                    'municipality_id' => $municipioPol->MunicipioPolId,
+                    'report_type_id' => $validated['report_type'],
+                    'report_status_id' => 'Reportado',
+                    'report_address' => $validated['address'], // Dirección generada
+                    'custom_report' => $validated['report_type'],
+                    'report_comment' => $validated['comment'],
+                    'gps_location' => $validated['gps_location'],
+                    'geospatial_location' => DB::raw("ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326)"),
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'is_contracted_municipality' => $contractedMunicipality ? 1 : 0,
+                    'mobile_model' => $validated['mobile_model'],
+                    'os_version' => $validated['os_version'],
+                    'app_version' => $validated['app_version'],
+                    'is_offline' => $validated['is_offline'],
+                    'network_type' => $validated['network_type'],
+                    'imei' => $validated['imei'],
+                    'reported_photo' => $reportedPhotoPath,
+                    'end_photo' => $endPhotoPath,
+                    'attachments' => $attachmentData ? json_encode($attachmentData) : null,
+                    'generated_from' => 'Móvil',
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
-            } else {
-                return response()->json(['error' => 'Failed to submit the report. Check the service URL or configuration.'], 500);
-            }
+
+                // Si no es un municipio contratado, no enviar el reporte al proyecto 2
+                if (!$contractedMunicipality) {
+                    throw new \Exception('Report successfully registered, but does not belong to a contracted municipality');
+                }
+
+                // Buscar en la tabla municipality_services filtrando por service_name = 'Ingresar reporte'
+                $municipalityService = DB::table('municipality_services')
+                    ->where('municipality_id', $contractedMunicipality->id)
+                    ->where('service_name', 'Ingresar reporte')
+                    ->first();
+
+                if (!$municipalityService) {
+                    throw new \Exception('No service found to submit the report in the municipality', 404);
+                }
+
+                // Concatenar la URL base del municipio con la API URL del servicio
+                $apiUrl = rtrim($contractedMunicipality->url, '/') . '/' . ltrim($municipalityService->api_url, '/');
+
+                // Preparar los headers con el token
+                $headers = [
+                    'Authorization' => 'Bearer ' . $contractedMunicipality->token,
+                    'Content-Type' => 'application/json',
+                ];
+
+                // Realizar la solicitud HTTP POST a la URL concatenada, incluyendo el report_id generado
+                $response = Http::withHeaders($headers);
+
+                // Adjuntar archivos si están presentes en la solicitud
+                if ($request->hasFile('reported_photo')) {
+                    $response = $response->attach(
+                        'reported_photo',
+                        $request->file('reported_photo'),
+                        $request->file('reported_photo')->getClientOriginalName()
+                    );
+                }
+
+                if ($request->hasFile('end_photo')) {
+                    $response = $response->attach(
+                        'end_photo',
+                        $request->file('end_photo'),
+                        $request->file('end_photo')->getClientOriginalName()
+                    );
+                }
+
+                if ($request->hasFile('attachments')) {
+                    $response = $response->attach(
+                        'attachments',
+                        $request->file('attachments'),
+                        $request->file('attachments')->getClientOriginalName()
+                    );
+                }
+
+                // Realizar la solicitud HTTP POST
+                $response = $response->post($apiUrl, [
+                    'report_id' => $generatedReportId,
+                    'latitude' => $validated['latitude'],
+                    'longitude' => $validated['longitude'],
+                    'state' => $municipioPol->EstadoPolId,
+                    'municipality' => $municipioPol->MunicipioPolId,
+                    'report_type' => $validated['report_type'],
+                    'address' => $validated['address'],
+                    'comment' => $validated['comment'],
+                    'phone' => $validated['phone'],
+                    'email' => $validated['email'],
+                    'gps_location' => $validated['gps_location'],
+                ]);
+
+                // Verificar si la solicitud fue exitosa
+                if ($response->successful()) {
+                    return response()->json([
+                        'message' => 'Report successfully submitted',
+                        'data' => $response->json(),
+                    ]);
+                } else {
+                    throw new \Exception('Failed to submit the report. Check the service URL or configuration.', 500);
+                }
+            });
+
+            return response()->json(['message' => 'Report successfully registered'], 201);
         } catch (\Exception $e) {
-            // Registrar cualquier error en los logs
             Log::error('Error saving report: ' . $e->getMessage());
 
             return response()->json([
                 'message' => 'There was an error while saving the report',
+                'status' => 'error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saveSimpleReport(Request $request)
+    {
+        try {
+            Log::info('Datos del request:', $request->all());
+
+            // Validación de los datos, incluyendo el report_id
+            $validated = $request->validate([
+                'report_id' => 'required|uuid',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'report_type' => 'required|string|max:50',
+                'comment' => 'nullable|string|max:90',
+                'phone' => 'nullable|string|max:20',
+                'email' => 'nullable|string|email|max:100',
+                'gps_location' => 'nullable|string|max:50',
+                'reported_photo' => 'nullable|file|image|max:2048',
+                'end_photo' => 'nullable|file|image|max:2048',
+                'attachments' => 'nullable|file|max:2048',
+                'mobile_model' => 'nullable|string|max:100',
+                'os_version' => 'nullable|string|max:50',
+                'app_version' => 'nullable|string|max:50',
+                'is_offline' => 'nullable|boolean',
+                'network_type' => 'nullable|string|max:20',
+                'imei' => 'nullable|string|max:20',
+            ]);
+
+            // Obtener la dirección usando las coordenadas si no se ha proporcionado
+            if (empty($validated['address'])) {
+                $validated['address'] = LocationHelper::obtenerDireccionCompleta($validated['latitude'], $validated['longitude']);
+            }
+
+            // Transacción para asegurar la concurrencia
+            DB::transaction(function () use ($validated, $request) {
+
+                // Consulta del polígono para obtener el estado y el municipio
+                $municipioPol = DB::table('MunicipioPol')
+                    ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
+                    ->first();
+
+                if (!$municipioPol) {
+                    throw new \Exception('No se encontró un municipio para las coordenadas proporcionadas', 404);
+                }
+
+                // Generar el folio único
+                $lastFolio = DB::table('reports')->max('report_folio');
+                $newFolio = $lastFolio ? $lastFolio + 1 : 100000;
+
+                // Guardar imágenes usando ImageHelper
+                $reportedPhotoPath = $request->hasFile('reported_photo')
+                    ? ImageHelper::storeImage($request->file('reported_photo'), 'reports')
+                    : null;
+
+                $endPhotoPath = $request->hasFile('end_photo')
+                    ? ImageHelper::storeImage($request->file('end_photo'), 'reports')
+                    : null;
+
+                $attachmentData = $request->hasFile('attachments')
+                    ? ImageHelper::storeFile($request->file('attachments'), 'reports')
+                    : null;
+
+                // Registrar el reporte en la tabla `reports` del proyecto 1
+                DB::table('reports')->insert([
+                    'report_id' => $validated['report_id'],
+                    'report_folio' => $newFolio,
+                    'report_registration_date' => now()->format('Y-m-d'),
+                    'report_registration_time' => now()->format('Y-m-d H:i:s'),
+                    'state_id' => $municipioPol->EstadoPolId,
+                    'municipality_id' => $municipioPol->MunicipioPolId,
+                    'report_type_id' => $validated['report_type'],
+                    'report_status_id' => 'Reportado',
+                    'report_address' => $validated['address'],
+                    'custom_report' => $validated['report_type'],
+                    'report_comment' => $validated['comment'],
+                    'gps_location' => $validated['gps_location'],
+                    'geospatial_location' => DB::raw("ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326)"),
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'is_contracted_municipality' => 1, // No validamos municipios contratados aquí
+                    'mobile_model' => $validated['mobile_model'],
+                    'os_version' => $validated['os_version'],
+                    'app_version' => $validated['app_version'],
+                    'is_offline' => $validated['is_offline'],
+                    'network_type' => $validated['network_type'],
+                    'imei' => $validated['imei'],
+                    'reported_photo' => $reportedPhotoPath,
+                    'end_photo' => $endPhotoPath,
+                    'attachments' => $attachmentData ? json_encode($attachmentData) : null,
+                    'generated_from' => 'Móvil',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            });
+
+            return response()->json(['message' => 'Reporte registrado exitosamente'], 201);
+        } catch (\Exception $e) {
+            Log::error('Error al guardar el reporte: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Hubo un error al guardar el reporte',
                 'status' => 'error',
                 'error' => $e->getMessage()
             ], 500);
@@ -709,12 +827,38 @@ class ApiController extends Controller
                         ->on('reports.municipality_id', '=', 'municipio.MunicipioId');
                 })
                 ->select(
-                    'reports.*',
-                    'estado.EstadoNombre',  // Nombre del estado
-                    'municipio.MunicipioNombre',  // Nombre del municipio
-                    'reports.report_type_id',  // ID del tipo de reporte (varchar)
-                    'reports.report_status_id',  // ID del estado del reporte (varchar)
-                    'reports.is_contracted_municipality'  // Indica si es un municipio contratado o no
+                    'reports.report_id',
+                    'reports.report_folio',
+                    'reports.report_registration_date',
+                    'reports.report_registration_time',
+                    'reports.report_reported_date',
+                    'reports.report_reported_time',
+                    'reports.state_id',
+                    'reports.municipality_id',
+                    'reports.report_type_id',
+                    'reports.report_status_id',
+                    'reports.is_contracted_municipality',
+                    'reports.report_address',
+                    'reports.custom_report',
+                    'reports.report_comment',
+                    'reports.gps_location',
+                    'reports.end_date',
+                    'reports.end_time',
+                    'reports.end_comment',
+                    'reports.end_photo',
+                    'reports.device_id',
+                    'reports.attention_user_id',
+                    'reports.attention_user_nick',
+                    'reports.blocked_report',
+                    'reports.phone',
+                    'reports.email',
+                    'reports.reported_photo',
+                    'reports.attachments',
+                    'reports.response_text',
+                    'reports.created_at',
+                    'reports.updated_at',
+                    'estado.EstadoNombre',
+                    'municipio.MunicipioNombre'
                 )
                 ->where('reports.report_id', $reportId)
                 ->first();
@@ -921,6 +1065,46 @@ class ApiController extends Controller
 
             return response()->json([
                 'message' => 'There was an error while getting the report status',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateReport(Request $request)
+    {
+        try {
+            // Validar los datos de entrada
+            $validated = $request->validate([
+                'report_id' => 'required|uuid',
+                'report_status' => 'required|string|max:50',
+                'report_comment' => 'nullable|string|max:90',
+                'report_address' => 'nullable|string|max:1024',
+            ]);
+
+            // Buscar el reporte en la base de datos
+            $report = DB::table('reports')->where('report_id', $validated['report_id'])->first();
+
+            if (!$report) {
+                return response()->json(['error' => 'No se encontró el reporte con el ID proporcionado'], 404);
+            }
+
+            // Actualizar el reporte con los nuevos valores
+            DB::table('reports')
+                ->where('report_id', $validated['report_id'])
+                ->update([
+                    'report_status_id' => $validated['report_status'],
+                    'report_comment' => $validated['report_comment'],
+                    'report_address' => $validated['report_address'],
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json(['message' => 'Reporte actualizado exitosamente'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar el reporte: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Hubo un error al actualizar el reporte',
                 'status' => 'error',
                 'error' => $e->getMessage(),
             ], 500);
