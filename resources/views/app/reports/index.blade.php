@@ -137,8 +137,8 @@
                             <td>{{ $report->EstadoNombre }}</td>
                             <td>{{ $report->MunicipioNombre }}</td>
                             <td>{{ $report->report_type_id }}</td>
-                            <td>{{ $report->report_address }}</td>
-                            <td>{{ $report->report_comment }}</td>
+                            <td>{!! $report->report_address !!}</td>
+                            <td>{!! $report->report_comment !!}</td>
                             <!-- Estatus con badge -->
                             <td>
                                 @if ($report->report_status_id == 'Completado')

@@ -110,7 +110,7 @@ class ReporteController extends Controller
                 ->toArray();
         }
 
-        // Construir la consulta base de reportes
+        // Construir la consulta base de reportes con orden por report_reported_time y respaldo en report_registration_time
         $reportsQuery = DB::table('reports')
             ->leftJoin('estado', 'reports.state_id', '=', 'estado.EstadoId')
             ->leftJoin('municipio', function ($join) {
@@ -128,6 +128,7 @@ class ReporteController extends Controller
                 'reports.municipality_id',
                 'reports.report_registration_date',
                 'reports.report_registration_time',
+                'reports.report_reported_time',
                 'reports.report_type_id',
                 'reports.report_status_id',
                 'reports.report_address',
@@ -137,7 +138,8 @@ class ReporteController extends Controller
                 'estado.EstadoNombre',
                 'municipio.MunicipioNombre',
                 'contracted_municipalities.url as municipality_url'
-            );
+            )
+            ->orderByRaw('COALESCE(reports.report_reported_time, reports.report_registration_time) DESC'); // Usar el respaldo si es null
 
         if ($request->filled('estado_id')) {
             $reportsQuery->where('reports.state_id', $request->estado_id);
@@ -157,7 +159,7 @@ class ReporteController extends Controller
         }
 
         if ($request->filled('search_start') && $request->filled('search_end')) {
-            $reportsQuery->whereBetween('reports.report_registration_time', [$request->search_start, $request->search_end]);
+            $reportsQuery->whereBetween('reports.report_reported_time', [$request->search_start, $request->search_end]);
         }
 
         if ($request->filled('contratado')) {
