@@ -37,6 +37,11 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/tipo-reporte-municipio', 'getTipoReporteMunicipio');
 
     Route::post('/estatus-reporte', 'getEstatusReporte');
+
+    Route::post('/user/register', 'registerUser');
+    Route::post('/user/login', 'loginUser');
+    Route::put('/user/update', 'updateUser');
+    Route::put('/user/update-password', 'updatePassword');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

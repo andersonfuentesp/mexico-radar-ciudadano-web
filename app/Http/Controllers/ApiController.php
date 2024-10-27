@@ -10,6 +10,7 @@ use App\Models\Municipio;
 use App\Models\MunicipioPol;
 use App\Models\ReportType;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -81,7 +82,7 @@ class ApiController extends Controller
             ->first();
 
         if (!$contractedMunicipality) {
-            return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
         }
 
         // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar noticias'
@@ -109,7 +110,6 @@ class ApiController extends Controller
             'municipio_id' => $request->municipio_id,
         ];
 
-        // Agregar los filtros de vigencia si están presentes
         if ($request->has('search_vigencia_inicial') && !empty($request->search_vigencia_inicial)) {
             $params['search_vigencia_inicial'] = $request->search_vigencia_inicial;
         }
@@ -118,18 +118,24 @@ class ApiController extends Controller
             $params['search_vigencia_final'] = $request->search_vigencia_final;
         }
 
-        // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
-        if (strtoupper($municipalityService->method) === 'POST') {
-            $response = Http::withHeaders($headers)->post($apiUrl, $params);
-        } else {
-            $response = Http::withHeaders($headers)->get($apiUrl, $params);
-        }
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
 
-        // 8. Devolver la respuesta de la solicitud HTTP
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['error' => 'No se pudo obtener las noticias. Verifica la URL del servicio o la configuración.'], 500);
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron noticias disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getNoticias: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de noticias.'], 200);
         }
     }
 
@@ -173,7 +179,7 @@ class ApiController extends Controller
             ->first();
 
         if (!$contractedMunicipality) {
-            return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
         }
 
         // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar tramites'
@@ -211,18 +217,24 @@ class ApiController extends Controller
             $params['search_tramite'] = $request->search_tramite;
         }
 
-        // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
-        if (strtoupper($municipalityService->method) === 'POST') {
-            $response = Http::withHeaders($headers)->post($apiUrl, $params);
-        } else {
-            $response = Http::withHeaders($headers)->get($apiUrl, $params);
-        }
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
 
-        // 8. Devolver la respuesta de la solicitud HTTP
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['error' => 'No se pudo obtener los trámites. Verifica la URL del servicio o la configuración.'], 500);
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron trámites disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getTramites: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de trámites.'], 200);
         }
     }
 
@@ -265,7 +277,7 @@ class ApiController extends Controller
             ->first();
 
         if (!$contractedMunicipality) {
-            return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
         }
 
         // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar terminos'
@@ -293,18 +305,24 @@ class ApiController extends Controller
             'municipio_id' => $request->municipio_id,
         ];
 
-        // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
-        if (strtoupper($municipalityService->method) === 'POST') {
-            $response = Http::withHeaders($headers)->post($apiUrl, $params);
-        } else {
-            $response = Http::withHeaders($headers)->get($apiUrl, $params);
-        }
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
 
-        // 8. Devolver la respuesta de la solicitud HTTP
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['error' => 'No se pudo obtener los términos. Verifica la URL del servicio o la configuración.'], 500);
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron términos disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getTerms: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de términos.'], 200);
         }
     }
 
@@ -347,7 +365,7 @@ class ApiController extends Controller
             ->first();
 
         if (!$contractedMunicipality) {
-            return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
         }
 
         // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar numeros de emergencia'
@@ -375,18 +393,24 @@ class ApiController extends Controller
             'municipio_id' => $request->municipio_id,
         ];
 
-        // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
-        if (strtoupper($municipalityService->method) === 'POST') {
-            $response = Http::withHeaders($headers)->post($apiUrl, $params);
-        } else {
-            $response = Http::withHeaders($headers)->get($apiUrl, $params);
-        }
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
 
-        // 8. Devolver la respuesta de la solicitud HTTP
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['error' => 'No se pudo obtener los números de emergencia. Verifica la URL del servicio o la configuración.'], 500);
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron números de emergencia disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getEmergencyNumbers: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de números de emergencia.'], 200);
         }
     }
 
@@ -435,7 +459,7 @@ class ApiController extends Controller
             ->first();
 
         if (!$contractedMunicipality) {
-            return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
         }
 
         // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar reportes'
@@ -476,18 +500,24 @@ class ApiController extends Controller
             $params['search_tipo_reporte'] = $request->search_tipo_reporte;
         }
 
-        // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
-        if (strtoupper($municipalityService->method) === 'POST') {
-            $response = Http::withHeaders($headers)->post($apiUrl, $params);
-        } else {
-            $response = Http::withHeaders($headers)->get($apiUrl, $params);
-        }
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
 
-        // 8. Devolver la respuesta de la solicitud HTTP
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['error' => 'No se pudo obtener los reportes. Verifica la URL del servicio o la configuración.'], 500);
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron reportes disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getReport: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de reportes.'], 200);
         }
     }
 
@@ -1105,6 +1135,165 @@ class ApiController extends Controller
 
             return response()->json([
                 'message' => 'Hubo un error al actualizar el reporte',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function registerUser(Request $request)
+    {
+        try {
+            // Validación de los datos de entrada
+            $validated = $request->validate([
+                'name' => 'required|string|max:100',
+                'email' => 'required|string|email|max:100|unique:mobile_users',
+                'password' => 'required|string|min:6',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'occupation' => 'nullable|string|max:100',
+                'device_id' => 'nullable|string|max:128',
+                'mobile_model' => 'nullable|string|max:100',
+                'os_version' => 'nullable|string|max:50',
+                'app_version' => 'nullable|string|max:50',
+                'network_type' => 'nullable|string|max:20',
+                'imei' => 'nullable|string|max:20',
+                'status' => 'nullable|string|max:50|in:active,inactive',
+            ]);
+
+            // Encriptar la contraseña y añadir las marcas de tiempo
+            $validated['password'] = bcrypt($validated['password']);
+            $validated['created_at'] = now();
+            $validated['updated_at'] = now();
+
+            // Creación del usuario
+            $user = DB::table('mobile_users')->insert($validated);
+
+            return response()->json(['message' => 'Usuario registrado exitosamente'], 201);
+        } catch (\Exception $e) {
+            Log::error('Error al registrar usuario: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al registrar el usuario',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function loginUser(Request $request)
+    {
+        try {
+            // Validación de las credenciales
+            $validated = $request->validate([
+                'email' => 'required|string|email|max:100',
+                'password' => 'required|string',
+            ]);
+
+            // Buscar el usuario por el correo
+            $user = DB::table('mobile_users')->where('email', $validated['email'])->first();
+
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
+                return response()->json(['error' => 'Credenciales incorrectas'], 401);
+            }
+
+            // Generar un token para la sesión
+            $token = Str::random(60);
+            DB::table('mobile_users')
+                ->where('email', $validated['email'])
+                ->update(['remember_token' => $token]);
+
+            return response()->json([
+                'message' => 'Inicio de sesión exitoso',
+                'token' => $token,
+                'user' => [
+                    'user_id' => $user->user_id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'occupation' => $user->occupation,
+                    'status' => $user->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error en inicio de sesión: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error en el inicio de sesión',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateUser(Request $request)
+    {
+        try {
+            // Validación de los datos de entrada
+            $validated = $request->validate([
+                'user_id' => 'required|exists:mobile_users,user_id', // ID del usuario para buscarlo en la base de datos
+                'name' => 'nullable|string|max:100',
+                'email' => 'nullable|string|email|max:100|unique:mobile_users,email,' . $request->user_id . ',user_id',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'occupation' => 'nullable|string|max:100',
+                'device_id' => 'nullable|string|max:128',
+                'mobile_model' => 'nullable|string|max:100',
+                'os_version' => 'nullable|string|max:50',
+                'app_version' => 'nullable|string|max:50',
+                'network_type' => 'nullable|string|max:20',
+                'imei' => 'nullable|string|max:20',
+                'status' => 'nullable|string|max:50|in:active,inactive',
+            ]);
+
+            // Actualización del usuario con los nuevos datos
+            $updateData = array_filter($validated); // Filtra valores nulos para evitar sobrescribir con null
+            $updateData['updated_at'] = now();
+
+            DB::table('mobile_users')
+                ->where('user_id', $validated['user_id'])
+                ->update($updateData);
+
+            return response()->json(['message' => 'Usuario actualizado exitosamente'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar usuario: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al actualizar el usuario',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            // Validación de la entrada
+            $validated = $request->validate([
+                'user_id' => 'required|exists:mobile_users,user_id', // ID del usuario para identificarlo
+                'current_password' => 'required|string', // Contraseña actual
+                'new_password' => 'required|string|min:6|different:current_password', // Nueva contraseña
+            ]);
+
+            // Buscar al usuario
+            $user = DB::table('mobile_users')->where('user_id', $validated['user_id'])->first();
+
+            // Verificar la contraseña actual
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return response()->json(['error' => 'La contraseña actual no es correcta'], 401);
+            }
+
+            // Actualizar la contraseña con la nueva contraseña encriptada
+            DB::table('mobile_users')
+                ->where('user_id', $validated['user_id'])
+                ->update([
+                    'password' => bcrypt($validated['new_password']),
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json(['message' => 'Contraseña actualizada exitosamente'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar la contraseña: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al actualizar la contraseña',
                 'status' => 'error',
                 'error' => $e->getMessage(),
             ], 500);
