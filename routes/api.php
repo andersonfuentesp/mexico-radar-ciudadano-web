@@ -24,6 +24,7 @@ Route::controller(ApiController::class)->group(function () {
     Route::get('/tramites', 'getTramites');
     Route::get('/terms', 'getTerms');
     Route::get('/numeros', 'getEmergencyNumbers');
+    Route::get('/emergency-numbers-by-location', 'getEmergencyNumbersByLocation');
 
     // Nueva ruta para guardar el reporte
     Route::get('/report', 'getReport');
@@ -37,6 +38,9 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/tipo-reporte-municipio', 'getTipoReporteMunicipio');
 
     Route::post('/estatus-reporte', 'getEstatusReporte');
+
+    Route::post('/report-user', 'reportUser');
+    Route::post('/search-user-reports', 'searchUserReports');
 
     Route::post('/user/register', 'registerUser');
     Route::post('/user/login', 'loginUser');

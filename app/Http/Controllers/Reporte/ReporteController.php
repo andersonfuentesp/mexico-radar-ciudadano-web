@@ -135,6 +135,7 @@ class ReporteController extends Controller
                 'reports.report_comment',
                 'reports.created_at',
                 'reports.is_contracted_municipality',
+                'reports.generated_from',
                 'estado.EstadoNombre',
                 'municipio.MunicipioNombre',
                 'contracted_municipalities.url as municipality_url'
