@@ -67,7 +67,7 @@ class ApiController extends Controller
         ]);
 
         // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
-        $municipioPol = DB::table('MunicipioPol')
+        $municipioPol = DB::table('municipiopol')
             ->where('EstadoPolId', $request->estado_id)
             ->where('MunicipioPolId', $request->municipio_id)
             ->first();
@@ -164,7 +164,7 @@ class ApiController extends Controller
         ]);
 
         // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
-        $municipioPol = DB::table('MunicipioPol')
+        $municipioPol = DB::table('municipiopol')
             ->where('EstadoPolId', $request->estado_id)
             ->where('MunicipioPolId', $request->municipio_id)
             ->first();
@@ -262,7 +262,7 @@ class ApiController extends Controller
         ]);
 
         // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
-        $municipioPol = DB::table('MunicipioPol')
+        $municipioPol = DB::table('municipiopol')
             ->where('EstadoPolId', $request->estado_id)
             ->where('MunicipioPolId', $request->municipio_id)
             ->first();
@@ -350,7 +350,7 @@ class ApiController extends Controller
         ]);
 
         // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
-        $municipioPol = DB::table('MunicipioPol')
+        $municipioPol = DB::table('municipiopol')
             ->where('EstadoPolId', $request->estado_id)
             ->where('MunicipioPolId', $request->municipio_id)
             ->first();
@@ -425,7 +425,7 @@ class ApiController extends Controller
             ]);
 
             // Buscar el municipio en la tabla MunicipioPol usando las coordenadas
-            $municipioPol = DB::table('MunicipioPol')
+            $municipioPol = DB::table('municipiopol')
                 ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
                 ->first();
 
@@ -510,7 +510,7 @@ class ApiController extends Controller
         ]);
 
         // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
-        $municipioPol = DB::table('MunicipioPol')
+        $municipioPol = DB::table('municipiopol')
             ->where('EstadoPolId', $request->estado_id)
             ->where('MunicipioPolId', $request->municipio_id)
             ->first();
@@ -638,7 +638,7 @@ class ApiController extends Controller
             // Consultar MunicipioPol fuera de la transacción
             // Consultar todos los campos de MunicipioPol, usando MunicipioPolGeoPolygon en lugar de MunicipioPolChar
             Log::info('Consultando MunicipioPol usando MunicipioPolGeoPolygon...');
-            $municipioPol = DB::table('MunicipioPol')
+            $municipioPol = DB::table('municipiopol')
                 ->select(
                     'EstadoPolId',
                     'MunicipioPolId',
@@ -869,7 +869,7 @@ class ApiController extends Controller
             DB::transaction(function () use ($validated, $request) {
 
                 // Consulta del polígono para obtener el estado y el municipio
-                $municipioPol = DB::table('MunicipioPol')
+                $municipioPol = DB::table('municipiopol')
                     ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
                     ->first();
 
@@ -1060,7 +1060,7 @@ class ApiController extends Controller
             ]);
 
             // Consulta del polígono para determinar el municipio
-            $municipioPol = DB::table('MunicipioPol')
+            $municipioPol = DB::table('municipiopol')
                 ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
                 ->first();
 
@@ -1143,7 +1143,7 @@ class ApiController extends Controller
             ]);
 
             // Consulta del polígono para determinar el municipio
-            $municipioPol = DB::table('MunicipioPol')
+            $municipioPol = DB::table('municipiopol')
                 ->whereRaw("ST_Contains(ST_GeomFromText(MunicipioPolChar, 4326), ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
                 ->first();
 
