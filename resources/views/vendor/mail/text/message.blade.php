@@ -4,6 +4,7 @@
         <x-mail::header :url="config('app.url')">
             {{ config('app.name') }}
         </x-mail::header>
+        ![Logo de la empresa](https://www.radarciudadano.mx/frontend/images/logo_oficial.png)
     </x-slot:header>
 
     {{-- Body --}}

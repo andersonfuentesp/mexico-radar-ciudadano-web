@@ -6,6 +6,8 @@
 </x-mail::header>
 </x-slot:header>
 
+![Logo de la empresa](https://www.radarciudadano.mx/frontend/images/logo_oficial.png)
+
 {{-- Body --}}
 {{ $slot }}
 

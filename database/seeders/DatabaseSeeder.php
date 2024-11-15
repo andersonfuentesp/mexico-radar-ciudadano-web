@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
             ReportStatusSeeder::class,
             ReportTypeSeeder::class,
             RoleSeeder::class,
-            ContractedMunicipalitiesSeeder::class,
-            MunicipalityServicesSeeder::class
+            //ContractedMunicipalitiesSeeder::class,
+            //MunicipalityServicesSeeder::class
         ]);
 
         // \App\Models\User::factory()->create([

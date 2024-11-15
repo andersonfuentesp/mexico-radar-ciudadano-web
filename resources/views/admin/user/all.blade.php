@@ -30,8 +30,8 @@
             <table id="datatable" class="table table-striped table-bordered" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 <thead>
                     <tr>
-                        <th>Sl</th>
-                        <th>Usuario</th>
+                        <th>Número</th>
+                        <th>Imagen</th>
                         <th>Nombres</th>
                         <th>Username</th>
                         <th>Correo</th>

@@ -122,33 +122,44 @@ class CommonController extends Controller
 
     public function profileUpdate(Request $request)
     {
+        // Validaciones
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+        ], [
+            'name.required' => 'El campo Nombres es obligatorio.',
+            'lastname.required' => 'El campo Apellidos es obligatorio.',
+            'email.required' => 'El campo Email es obligatorio.',
+            'email.email' => 'El campo Email debe ser una dirección válida.'
+        ]);
+
         $id = Auth::user()->id;
         $data = User::find($id);
 
-        // Actualizando los campos básicos
+        // Actualizando los campos
         $data->name = $request->name;
         $data->lastname = $request->lastname;
         $data->email = $request->email;
-        $data->phone = $request->phone; // Asegúrate de que este campo exista en tu modelo y en la base de datos
+        $data->phone = $request->phone;
 
         // Manejo de la carga de la imagen
         if ($request->file('image')) {
             $file = $request->file('image');
             $filename = date('YmdHi') . $this->sanitizeFileName($file->getClientOriginalName());
             $file->move(public_path('files/profile'), $filename);
-            $data['image'] = 'files/profile/' . $filename;
+            $data->image = 'files/profile/' . $filename;
         }
 
         // Guardando los cambios
         $data->save();
 
-        // Mensaje de notificación para la vista
+        // Mensaje de notificación
         $notification = [
             'message' => 'Datos actualizados con éxito!',
             'alert-type' => 'success'
         ];
 
-        // Redirigiendo con la notificación
         return redirect()->route('admin.profile')->with($notification);
     }
 
@@ -161,12 +172,24 @@ class CommonController extends Controller
     {
         $request->validate([
             'oldpassword' => 'required',
-            'newpassword' => 'required|string|min:6',
+            'newpassword' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/'
+            ],
             'confirm_password' => 'required|same:newpassword',
         ], [
             'oldpassword.required' => 'La contraseña antigua es requerida',
-            'newpassword.required' => 'La nueva antigua es requerida',
-            'confirm_password.required' => 'La confirmación de nueva contraseña es requerida'
+            'newpassword.required' => 'La nueva contraseña es requerida',
+            'newpassword.regex' => 'La nueva contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.',
+            'confirm_password.required' => 'La confirmación de la nueva contraseña es requerida',
+            'confirm_password.same' => 'La confirmación de la nueva contraseña no coincide con la nueva contraseña.',
+        ], [
+            // Alias de nombres de campo en español
+            'oldpassword' => 'contraseña antigua',
+            'newpassword' => 'nueva contraseña',
+            'confirm_password' => 'confirmación de nueva contraseña'
         ]);
 
         $hashedPassword = Auth::user()->password;
@@ -178,7 +201,7 @@ class CommonController extends Controller
             session()->flash('message', 'Contraseña actualizada con éxito!');
             return redirect()->back();
         } else {
-            session()->flash('message', 'Contraseña antigua no coincide con nuestros registros!');
+            session()->flash('message', 'La contraseña antigua no coincide con nuestros registros!');
             return redirect()->back();
         }
     }

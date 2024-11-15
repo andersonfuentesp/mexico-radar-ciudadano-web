@@ -41,8 +41,7 @@ class User extends Authenticatable
 
     public function adminlte_image()
     {
-        //return "https://picsum.photos/300/300";
-        if (!empty(auth()->user()->image)) {
+        if (!empty(auth()->user()->image) && file_exists(public_path(auth()->user()->image))) {
             return asset(auth()->user()->image);
         } else {
             return "https://picsum.photos/300/300";

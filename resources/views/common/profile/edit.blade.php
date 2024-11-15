@@ -19,7 +19,6 @@
 @stop
 
 @section('content')
-
     <div class="card">
         <div class="card-header">
             <h1 class="card-title"><i class="fas fa-user-edit"></i> Datos generales</h1>
@@ -31,9 +30,9 @@
 
                 <!-- Nombres -->
                 <div class="form-group row">
-                    <label for="name" class="col-sm-2 col-form-label"><i class="fas fa-user"></i> Nombres</label>
+                    <label for="name" class="col-sm-2 col-form-label"><i class="fas fa-user"></i> Nombres <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                        <input class="form-control" name="name" value="{{ $userData->name }}" type="text" id="name">
+                        <input class="form-control" name="name" value="{{ $userData->name }}" type="text" id="name" required>
                         @error('name')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -42,18 +41,18 @@
 
                 <!-- Apellidos -->
                 <div class="form-group row">
-                    <label for="lastname" class="col-sm-2 col-form-label"><i class="fas fa-user"></i> Apellidos</label>
+                    <label for="lastname" class="col-sm-2 col-form-label"><i class="fas fa-user"></i> Apellidos <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                        <input class="form-control" name="lastname" value="{{ $userData->lastname }}" type="text" id="lastname">
+                        <input class="form-control" name="lastname" value="{{ $userData->lastname }}" type="text" id="lastname" required>
                         @error('lastname')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
 
-                <!-- Username -->
+                <!-- Username (solo lectura) -->
                 <div class="form-group row">
-                    <label for="username" class="col-sm-2 col-form-label"><i class="fas fa-user-tag"></i> Username</label>
+                    <label for="username" class="col-sm-2 col-form-label"><i class="fas fa-user-tag"></i> Username <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
                         <input class="form-control" name="username" value="{{ $userData->username }}" type="text" id="username" readonly>
                         @error('username')
@@ -64,9 +63,9 @@
 
                 <!-- Email -->
                 <div class="form-group row">
-                    <label for="email" class="col-sm-2 col-form-label"><i class="fas fa-envelope"></i> Email</label>
+                    <label for="email" class="col-sm-2 col-form-label"><i class="fas fa-envelope"></i> Email <span class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                        <input class="form-control" name="email" value="{{ $userData->email }}" type="email" id="email">
+                        <input class="form-control" name="email" value="{{ $userData->email }}" type="email" id="email" required>
                         @error('email')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -94,10 +93,10 @@
                         </div>
                         <div class="input-group-append">
                             <span class="input-group-text">Subir</span>
+                        </div>
                         @error('image')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                        </div>
                     </div>
                 </div>
 
@@ -113,12 +112,11 @@
             </div>
 
             <div class="card-footer">
-                <input type="submit" class="btn btn-custom btn-rounded waves-effect waves-light" value="Actualizar datos de perfil">
+                <input type="submit" class="btn btn-info btn-rounded waves-effect waves-light" value="Actualizar datos de perfil">
                 <a href="{{ route('admin.profile') }}" class="btn btn-default"><i class="fas fa-arrow-left"></i> Regresar</a>
             </div>
         </form>
     </div>
-
 @stop
 
 @section('jscode')

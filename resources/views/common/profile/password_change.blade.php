@@ -18,18 +18,14 @@
 @stop
 
 @section('content')
-
     <div class="card">
         <div class="card-header">
             <h1 class="card-title"><i class="fas fa-key"></i> Actualizar clave de seguridad</h1>
         </div>
 
         <form class="form-horizontal" id="myForm" method="POST" action="{{ route('admin.password.update') }}">
-
             @csrf
-
             <div class="card-body">
-
                 @if (count($errors))
                     @foreach ($errors->all() as $error)
                         <p class="alert alert-danger alert-dismissible fade show">{{ $error }}</p>
@@ -37,7 +33,9 @@
                 @endif
 
                 <div class="form-group row">
-                    <label for="old-password-input" class="col-sm-2 col-form-label"><i class="fas fa-lock"></i> Contraseña antigua</label>
+                    <label for="old-password-input" class="col-sm-2 col-form-label">
+                        <i class="fas fa-lock"></i> Contraseña antigua <span class="text-danger">*</span>
+                    </label>
                     <div class="col-sm-10">
                         <input class="form-control" name="oldpassword" type="password" id="old-password-input"
                             placeholder="Introduce tu contraseña actual" required>
@@ -45,25 +43,31 @@
                 </div>
 
                 <div class="form-group row">
-                    <label for="new-password-input" class="col-sm-2 col-form-label"><i class="fas fa-lock"></i> Nueva Contraseña</label>
+                    <label for="new-password-input" class="col-sm-2 col-form-label">
+                        <i class="fas fa-lock"></i> Nueva Contraseña <span class="text-danger">*</span>
+                    </label>
                     <div class="col-sm-10">
                         <input class="form-control" name="newpassword" type="password" id="new-password-input"
                             placeholder="Introduce la nueva contraseña" required>
+                        <small class="form-text text-muted">
+                            La contraseña debe tener al menos 6 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial.
+                        </small>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label for="confirm-password-input" class="col-sm-2 col-form-label"><i class="fas fa-lock"></i> Confirmar Contraseña</label>
+                    <label for="confirm-password-input" class="col-sm-2 col-form-label">
+                        <i class="fas fa-lock"></i> Confirmar Contraseña <span class="text-danger">*</span>
+                    </label>
                     <div class="col-sm-10">
                         <input class="form-control" name="confirm_password" type="password" id="confirm-password-input"
                             placeholder="Confirma la nueva contraseña" required>
                     </div>
                 </div>
-
             </div>
 
             <div class="card-footer">
-                <button type="submit" class="btn btn-custom btn-rounded waves-effect waves-light">
+                <button type="submit" class="btn btn-info btn-rounded waves-effect waves-light">
                     <i class="fas fa-sync-alt"></i> Actualizar datos de seguridad
                 </button>
                 <a href="{{ route('admin.index') }}" class="btn btn-default">
@@ -71,7 +75,5 @@
                 </a>
             </div>
         </form>
-
     </div>
-
 @stop
