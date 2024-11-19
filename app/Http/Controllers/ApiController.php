@@ -37,7 +37,9 @@ class ApiController extends Controller
      */
     public function getMunicipiosByEstado($estadoId)
     {
-        $municipios = Municipio::where('EstadoId', $estadoId)->get();
+        $municipios = Municipio::where('EstadoId', $estadoId)
+            ->orderBy('MunicipioNombre', 'asc')
+            ->get();
         return response()->json($municipios);
     }
 

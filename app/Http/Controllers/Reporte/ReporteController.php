@@ -530,7 +530,7 @@ class ReporteController extends Controller
             $mobileReport = Report::where('report_id', $reportId)->first();
 
             // 2. Buscar el polígono del municipio usando el estado y municipio proporcionados
-            $municipioPol = DB::table('MunicipioPol')
+            $municipioPol = DB::table('municipiopol')
                 ->where('EstadoPolId', $stateId)
                 ->where('MunicipioPolId', $municipalityId)
                 ->first();
