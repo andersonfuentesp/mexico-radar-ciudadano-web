@@ -96,7 +96,7 @@
 }
 
 .dl-slider .dl-btn {
-    background-color: #082f70;
+    background-color: #b83e5a;
     display: inline-block;
     color: #fff;
     font-size: 12px;
@@ -211,7 +211,7 @@
 }
 
 .dl-slider .slick-dots li.slick-active button {
-    background-color: #082f70;
+    background-color: #b83e5a;
     transition: all .3s ease-in-out
 }
 

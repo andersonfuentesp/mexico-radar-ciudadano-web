@@ -1,4 +1,4 @@
-@extends('master')
+@extends('landing.master')
 
 @section('title')
     Servicios
@@ -18,7 +18,7 @@
         <div class="dots"></div>
     </section>
 
-    @include('body.services-2')
+    @include('landing.body.services-2')
 
     <section class="service-section section-2">
         <div class="dots"></div>

@@ -1,4 +1,4 @@
-@extends('master')
+@extends('landing.master')
 
 @section('title')
     Servicios - Cartografía

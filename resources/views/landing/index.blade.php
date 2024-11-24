@@ -12,7 +12,6 @@
 
     @include('landing.body.benefits')
 
-    @include('landing.body.projects')
     @include('landing.body.solutions')
     {{-- @include('body.testimonial') --}}
     {{-- @include('body.blog') --}}

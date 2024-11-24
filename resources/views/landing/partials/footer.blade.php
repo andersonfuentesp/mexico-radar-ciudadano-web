@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-lg-3 col-sm-6 sm-padding">
                 <div class="widget-content">
-                    <a href="#"><img src="{{ asset('website/img/logos/logo-3.png') }}" alt="brand"></a>
+                    <a href="#"><img src="{{ asset('website/img/logos/logo_footer.png') }}" alt="brand"></a>
                     <p style="text-align: justify;">Transformando el mundo a través de la cartografía avanzada y el
                         desarrollo de sistemas de
                         información geográfica. Nos especializamos en servicios de cartografía, aplicaciones,
@@ -24,7 +24,6 @@
                                 <li><a href="{{ route('website.servicios.analisis') }}">Análisis de Datos</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ route('website.proyectos') }}">Proyectos</a></li>
                         <li><a href="{{ route('website.contacto') }}">Contacto</a></li>
                     </ul>
                 </div>
@@ -68,9 +67,10 @@
     </div>
 </section>
 
-
 <footer class="footer-section align-center">
     <div class="container">
-        <p><a href="">Grupo de investigación y tecnología aplicada AI</a></p>
+        <p>
+            <a href="">Radar ciudadano</a> © {{ date('Y') }}. Todos los derechos reservados.
+        </p>
     </div>
 </footer>

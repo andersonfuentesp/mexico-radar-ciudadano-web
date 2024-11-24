@@ -75,7 +75,7 @@
                     </div>
                     <div class="dl-btn-group">
                         <div class="inner-layer">
-                            <a href="{{ route('website.proyectos') }}" class="dl-btn" data-animation="fade-in-bottom"
+                            <a href="{{ route('website.servicios') }}" class="dl-btn" data-animation="fade-in-bottom"
                                 data-delay="3.5s">Ver
                                 Proyectos <i class="arrow_right"></i></a>
                         </div>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="dl-btn-group">
                         <div class="inner-layer">
-                            <a href="{{ route('website.proyectos') }}" class="dl-btn" data-animation="fade-in-right"
+                            <a href="{{ route('website.servicios') }}" class="dl-btn" data-animation="fade-in-right"
                                 data-delay="3.5s">Ver
                                 Proyectos <i class="arrow_right"></i></a>
                         </div>

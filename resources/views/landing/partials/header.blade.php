@@ -22,14 +22,14 @@
                 <div class="header-menu-wrap">
                     <ul class="dl-menu">
                         <li><a href="{{ route('website.index') }}">Inicio</a></li>
+                        <li><a href="{{ route('website.servicios') }}">Servicios</a></li>
+                        <li><a href="{{ route('website.galeria') }}">Galería</a></li>
                         <li><a href="#">Nosotros</a>
                             <ul>
                                 <li><a href="{{ route('website.nosotros') }}">Sobre nosotros</a></li>
                                 <li><a href="{{ route('website.nosotros-company') }}">Sobre la compañía</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ route('website.servicios') }}">Servicios</a></li>
-                        <li><a href="{{ route('website.proyectos') }}">Proyectos</a></li>
                         <li><a href="{{ route('website.contacto') }}">Contacto</a></li>
                     </ul>
                 </div>

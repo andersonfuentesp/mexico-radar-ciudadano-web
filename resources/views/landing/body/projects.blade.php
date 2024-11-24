@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="col-lg-4 col-md-6 text-right">
-                <a href="{{ route('website.proyectos') }}" class="default-btn">Ver Todos los Proyectos</a>
+                <a href="{{ route('website.servicios') }}" class="default-btn">Ver Todos los Proyectos</a>
             </div>
         </div>
         <div id="projects-carousel" class="projects-carousel owl-carousel">
@@ -22,8 +22,8 @@
                     <i class="fas fa-expand"></i>
                 </a>
                 <div class="projects-content">
-                    <a href="{{ route('website.proyectos') }}" class="category">Logística</a>
-                    <h3><a href="{{ route('website.proyectos') }}" class="tittle">Optimización de Rutas de Entrega para Empresa de Logística</a>
+                    <a href="{{ route('website.servicios') }}" class="category">Logística</a>
+                    <h3><a href="{{ route('website.servicios') }}" class="tittle">Optimización de Rutas de Entrega para Empresa de Logística</a>
                     </h3>
                     <p style="text-align: justify;">Colaboración para optimizar operaciones de entrega con una solución que integra análisis de datos
                         y seguimiento en tiempo real.</p>
@@ -38,8 +38,8 @@
                     <i class="fas fa-expand"></i>
                 </a>
                 <div class="projects-content">
-                    <a href="{{ route('website.proyectos') }}" class="category">Ventas Directas</a>
-                    <h3><a href="{{ route('website.proyectos') }}" class="tittle">Desarrollo de Aplicación Móvil para Gestión de Ventas en
+                    <a href="{{ route('website.servicios') }}" class="category">Ventas Directas</a>
+                    <h3><a href="{{ route('website.servicios') }}" class="tittle">Desarrollo de Aplicación Móvil para Gestión de Ventas en
                             Ruta</a></h3>
                     <p style="text-align: justify;">Aplicación móvil personalizada para agilizar las ventas directas y optimizar la entrega, con
                         acceso a datos en tiempo real.</p>

@@ -26,6 +26,8 @@ Route::controller(WebsiteController::class)->group(function () {
     Route::get('/nosotros-empresa', 'nosotrosEmpresa')->name('website.nosotros-company');
 
     Route::get('/servicios', 'servicios')->name('website.servicios');
+    Route::get('/galeria', 'galeria')->name('website.galeria');
+
     Route::get('/servicios/cartografia', 'serviciosCartografia')->name('website.servicios.cartografia');
     Route::get('/servicios/aplicaciones', 'serviciosAplicaciones')->name('website.servicios.aplicaciones');
     Route::get('/servicios/mapas-satelitales', 'serviciosMapas')->name('website.servicios.mapas');
@@ -33,10 +35,6 @@ Route::controller(WebsiteController::class)->group(function () {
 
     Route::get('/cotizacion', 'cotizacion')->name('website.cotizacion');
     Route::post('/cotizacion-send', 'cotizacionStore')->name('website.cotizacion.send');
-
-    Route::get('/proyectos', 'proyectos')->name('website.proyectos');
-
-    Route::get('/blog', 'blog')->name('website.blog');
 
     Route::get('/contacto', 'contacto')->name('website.contacto');
     Route::post('/contact-send', 'contactoStore')->name('website.contacto.send');
