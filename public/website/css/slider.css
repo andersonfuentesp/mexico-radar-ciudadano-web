@@ -123,6 +123,12 @@
     transition: all .2s ease-in-out
 }
 
+.dl-menu li a.active {
+    text-decoration: underline !important; /* Asegura el subrayado */
+    text-underline-offset: 7px !important; /* Ajusta la separación del subrayado */
+    font-weight: bold; /* Opcional: resaltar el texto */
+}
+
 @media only screen and (max-width:992px) {
     .slider-content-wrap {
         height: 400px

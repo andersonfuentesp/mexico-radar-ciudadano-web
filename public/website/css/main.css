@@ -449,7 +449,7 @@ button {
 }
 
 .header {
-    background-color: #fff;
+    background-color: #b83e5a;
     width: 100%;
     height: auto;
     display: block
@@ -473,7 +473,7 @@ button {
 }
 
 .sticky-header .primary-header {
-    background-color: #fff;
+    background-color: #b83e5a;
     box-shadow: 0 2px 5px -2px rgba(0, 0, 0, .1)
 }
 
@@ -574,11 +574,11 @@ button {
 .header-menu-wrap ul li>a {
     display: block;
     font-family: work sans, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0;
     text-transform: uppercase;
-    font-weight: 600;
-    color: #263a4f;
+    font-weight: 500;
+    color: #fff;
     padding: 0 20px;
     height: 80px;
     line-height: 80px;
@@ -587,7 +587,7 @@ button {
 }
 
 .header-menu-wrap ul li:hover>a {
-    color: #b83e5a
+    color: #fab6cf
 }
 
 .header-menu-wrap ul li ul {
@@ -711,7 +711,7 @@ button {
 
     .header-menu-wrap {
         display: none;
-        background-color: #fff;
+        background-color: #b83e5a;
         width: 100%;
         height: auto;
         padding: 0 20px;
@@ -792,7 +792,8 @@ button {
 }
 
 .header-right a.menu-btn {
-    background-color: #b83e5a;
+    background-color: #c7546e;
+    font-weight: 500;
     line-height: 40px;
     color: #fff;
     border-radius: 3px;
@@ -803,7 +804,7 @@ button {
 }
 
 .header-right a.menu-btn:hover {
-    background-color: #b83e5a;
+    background-color: #cf6b82;
     opacity: .8;
     color: #fff
 }
@@ -2612,13 +2613,24 @@ blockquote span {
     /* Espacio arriba y abajo para el contenido de contacto */
 }
 
-.contact-info {
-    text-align: right;
-    /* Alinea el texto de contacto a la derecha */
-    padding-right: 15px;
-    /* Ajuste para el padding derecho */
-    color: #333;
-    /* Color del texto */
+.contact-top {
+    background-color: #000; /* Fondo negro */
+    color: #fff; /* Texto blanco */
+    padding: 10px 0; /* Espaciado vertical */
+}
+
+.contact-top .contact-info {
+    text-align: center; /* Centrar el texto */
+}
+
+.contact-top .contact-info a {
+    color: #fff; /* Texto blanco para el enlace */
+    text-decoration: none; /* Sin subrayado */
+    font-size: 16px; /* Tamaño del texto */
+}
+
+.contact-top .contact-info a:hover {
+    text-decoration: underline; /* Subrayado al pasar el cursor */
 }
 
 .whatsapp-icon {

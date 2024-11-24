@@ -5,7 +5,7 @@
 <div class="contact-top">
     <div class="container">
         <div class="contact-info">
-            <a>Contáctanos +52 1 55 3912 9260</a>
+            <a>¡Descarga la aplicación Gratis y empieza a Reportar Incidencias!</a>
         </div>
     </div>
 </div>
@@ -16,21 +16,31 @@
             <div class="primary-header-inner">
                 <div class="header-logo">
                     <a href="{{ route('website.index') }}">
-                        <img src="{{ asset('website/img/logos/logo_oficial.png') }}" alt="Indico" style="border-radius: 5px;">
+                        <img src="{{ asset('website/img/logos/logo_radar.png') }}" width="85"
+                            style="margin-top: 5px; margin-bottom: 5px" alt="Indico" style="border-radius: 5px;">
                     </a>
-                </div>                
+                </div>
                 <div class="header-menu-wrap">
                     <ul class="dl-menu">
-                        <li><a href="{{ route('website.index') }}">Inicio</a></li>
-                        <li><a href="{{ route('website.servicios') }}">Servicios</a></li>
-                        <li><a href="{{ route('website.galeria') }}">Galería</a></li>
-                        <li><a href="#">Nosotros</a>
+                        <li><a href="{{ route('website.index') }}"
+                                class="{{ request()->routeIs('website.index') ? 'active' : '' }}">Inicio</a></li>
+                        <li><a href="{{ route('website.servicios') }}"
+                                class="{{ request()->routeIs('website.servicios') ? 'active' : '' }}">Servicios</a></li>
+                        <li><a href="{{ route('website.galeria') }}"
+                                class="{{ request()->routeIs('website.galeria') ? 'active' : '' }}">Galería</a></li>
+                        <li><a href="#"
+                                class="{{ request()->routeIs('website.nosotros*') ? 'active' : '' }}">Nosotros</a>
                             <ul>
-                                <li><a href="{{ route('website.nosotros') }}">Sobre nosotros</a></li>
-                                <li><a href="{{ route('website.nosotros-company') }}">Sobre la compañía</a></li>
+                                <li><a href="{{ route('website.nosotros') }}"
+                                        class="{{ request()->routeIs('website.nosotros') ? 'active' : '' }}">Sobre
+                                        nosotros</a></li>
+                                <li><a href="{{ route('website.nosotros-company') }}"
+                                        class="{{ request()->routeIs('website.nosotros-company') ? 'active' : '' }}">Sobre
+                                        la compañía</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ route('website.contacto') }}">Contacto</a></li>
+                        <li><a href="{{ route('website.contacto') }}"
+                                class="{{ request()->routeIs('website.contacto') ? 'active' : '' }}">Contacto</a></li>
                     </ul>
                 </div>
                 <div class="header-right">
