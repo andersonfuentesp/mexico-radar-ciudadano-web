@@ -34,7 +34,7 @@
                     </ul>
                 </div>
                 <div class="header-right">
-                    <a class="menu-btn" style="font-size: 14px;" href="{{ route('login') }}">INGRESAR</a>
+                    <a class="menu-btn" style="font-size: 14px;" href="{{ route('login') }}">LOGIN</a>
 
                     <div class="mobile-menu-icon">
                         <div class="burger-menu">
