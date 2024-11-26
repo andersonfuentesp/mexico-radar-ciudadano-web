@@ -9,7 +9,7 @@
         <div class="container">
             <div class="page-content text-center">
                 <h2>Nuestros servicios</h2>
-                <p>Investigación y tecnología aplicada.</p>
+                <p>Soluciones tecnológicas para reportes ciudadanos y mejora comunitaria.</p>
             </div>
         </div>
     </section>

@@ -46,6 +46,10 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/user/login', 'loginUser');
     Route::put('/user/update', 'updateUser');
     Route::put('/user/update-password', 'updatePassword');
+
+    Route::post('/mobile-user/forgot-password', 'forgotPassword'); // Solicitar recuperación de contraseña
+    Route::post('/mobile-user/verify-code', 'verifyCode'); // Verificar el código ingresado
+    Route::post('/mobile-user/reset-password', 'resetPassword');  // Restablecer contraseña con el token
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

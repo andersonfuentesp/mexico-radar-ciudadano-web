@@ -30,6 +30,11 @@ class WebsiteController extends Controller
         return view('landing.servicios');
     }
 
+    public function galeria()
+    {
+        return view('landing.galeria');
+    }
+
     public function contacto()
     {
         return view('landing.contacto');
@@ -70,7 +75,7 @@ class WebsiteController extends Controller
             'message' => $request->get('message')
         ];
 
-        Mail::to("contacto@grupoitaai.com")->send(new ContactFormMail($details));
+        Mail::to("contacto@radarciudadano.mx")->send(new ContactFormMail($details));
 
         $notification = [
             'message' => 'Mensaje enviado con éxito',

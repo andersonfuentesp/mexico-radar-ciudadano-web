@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail;
 
 class ApiController extends Controller
 {
@@ -1573,6 +1575,118 @@ class ApiController extends Controller
             Log::error('Error al actualizar la contraseña: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Hubo un error al actualizar la contraseña',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|string|email|max:100|exists:mobile_users,email',
+            ]);
+
+            // Obtener información del usuario
+            $user = DB::table('mobile_users')
+                ->where('email', $validated['email'])
+                ->first();
+
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado'], 404);
+            }
+
+            // Generar un código alfanumérico único
+            $code = Str::upper(Str::random(8)); // Ejemplo: "A1B2C3D4"
+
+            // Guardar el código en el campo 'token' de la tabla
+            DB::table('mobile_password_resets')->updateOrInsert(
+                ['email' => $validated['email']],
+                [
+                    'token' => $code,
+                    'created_at' => now(),
+                ]
+            );
+
+            // Enviar el correo con el código y los datos del usuario
+            Mail::to($validated['email'])->send(new PasswordResetMail($code, $user));
+
+            return response()->json(['message' => 'Se ha enviado un código a tu correo'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error en la recuperación de contraseña: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al solicitar la recuperación de contraseña',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function verifyCode(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|string|email|max:100|exists:mobile_password_resets,email',
+                'code' => 'required|string|max:8',
+            ]);
+
+            // Verificar si el código (token) es válido
+            $record = DB::table('mobile_password_resets')
+                ->where('email', $validated['email'])
+                ->where('token', $validated['code'])
+                ->first();
+
+            if (!$record) {
+                return response()->json(['error' => 'El código es inválido o ha expirado'], 401);
+            }
+
+            return response()->json(['message' => 'Código verificado correctamente'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al verificar el código: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al verificar el código',
+                'status' => 'error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|string|email|max:100|exists:mobile_users,email',
+                'code' => 'required|string|max:8',
+                'new_password' => 'required|string|min:6|confirmed',
+            ]);
+
+            // Verificar si el código (token) es válido
+            $record = DB::table('mobile_password_resets')
+                ->where('email', $validated['email'])
+                ->where('token', $validated['code'])
+                ->first();
+
+            if (!$record) {
+                return response()->json(['error' => 'El código es inválido o ha expirado'], 401);
+            }
+
+            // Actualizar la contraseña
+            DB::table('mobile_users')
+                ->where('email', $validated['email'])
+                ->update([
+                    'password' => bcrypt($validated['new_password']),
+                    'updated_at' => now(),
+                ]);
+
+            // Eliminar el código después de usarlo
+            DB::table('mobile_password_resets')->where('email', $validated['email'])->delete();
+
+            return response()->json(['message' => 'Contraseña restablecida exitosamente'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al restablecer la contraseña: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Hubo un error al restablecer la contraseña',
                 'status' => 'error',
                 'error' => $e->getMessage(),
             ], 500);

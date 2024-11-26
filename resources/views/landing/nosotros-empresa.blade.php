@@ -9,7 +9,7 @@
         <div class="container">
             <div class="page-content text-center">
                 <h2>Sobre la empresa</h2>
-                <p>Investigación y tecnología aplicada.</p>
+                <p>Empoderando comunidades con tecnología y soluciones innovadoras.</p>
             </div>
         </div>
     </section>
@@ -19,15 +19,15 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 sm-padding">
                     <div class="service-content wow fadeInLeft">
-                        <span>Acerca de Grupo de Investigación y Tecnología Aplicada AI</span>
-                        <h2>Ofrecemos soluciones innovadoras en cartografía y análisis de datos</h2>
-                        <p style="text-align: justify;">En Grupo de Investigación y Tecnología Aplicada AI, nos dedicamos a ofrecer soluciones
-                            innovadoras
-                            en los campos de la cartografía, servicios de aplicaciones, mapas satelitales y análisis de
-                            datos. Con
-                            un enfoque centrado en la excelencia y la satisfacción del cliente, trabajamos incansablemente
-                            para
-                            proporcionar servicios de alta calidad que impulsen el éxito de nuestros clientes.</p>
+                        <span>Acerca de Radar Ciudadano</span>
+                        <h2>Innovamos para mejorar comunidades y facilitar la gestión ciudadana</h2>
+                        <p style="text-align: justify;">
+                            En Radar Ciudadano, estamos comprometidos con el desarrollo de soluciones tecnológicas que
+                            transformen la manera en que las comunidades gestionan y resuelven incidencias. Desde la
+                            geolocalización de reportes hasta el análisis avanzado de datos, nuestro enfoque se centra
+                            en conectar a los ciudadanos con las herramientas y servicios necesarios para crear un
+                            entorno más seguro, eficiente y colaborativo.
+                        </p>
                         <a href="{{ route('website.servicios') }}" class="default-btn">Conoce Nuestros Servicios</a>
                     </div>
                 </div>
@@ -35,36 +35,42 @@
                     <div class="row services-list">
                         <div class="col-md-6 padding-15">
                             <div class="service-item box-shadow wow fadeInUp" data-wow-delay="100ms">
-                                <i class="flaticon-worker"></i>
-                                <!-- Cambiado a un ícono de tecnología representativa -->
-                                <h3>Cartografía</h3>
-                                <p style="text-align: justify;">Nuestra experiencia en cartografía nos permite ofrecer una amplia gama de servicios,
-                                    desde la digitalización de mapas hasta la creación de modelos geoespaciales avanzados.
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h3>Geolocalización</h3>
+                                <p style="text-align: justify;">
+                                    Nuestra plataforma permite localizar incidencias con precisión, agilizando la
+                                    respuesta de las autoridades y optimizando recursos comunitarios.
                                 </p>
                             </div>
                         </div>
                         <div class="col-md-6 padding-15 offset-top">
                             <div class="service-item box-shadow wow fadeInUp" data-wow-delay="300ms">
-                                <i class="flaticon-control-system"></i> <!-- Mantenido por ser adecuado para el servicio -->
-                                <h3>Servicios de Aplicaciones</h3>
-                                <p style="text-align: justify;">Desarrollamos aplicaciones personalizadas para satisfacer las
-                                    necesidades específicas de nuestros clientes.</p>
+                                <i class="fas fa-mobile-alt"></i>
+                                <h3>Desarrollo de Aplicaciones</h3>
+                                <p style="text-align: justify;">
+                                    Creamos aplicaciones móviles y web personalizadas que facilitan la interacción entre
+                                    los ciudadanos y las autoridades locales.
+                                </p>
                             </div>
                         </div>
                         <div class="col-md-6 padding-15">
                             <div class="service-item box-shadow wow fadeInUp" data-wow-delay="400ms">
-                                <i class="flaticon-generator"></i> <!-- Asumiendo que es parte de tu colección existente -->
-                                <h3>Mapas Satelitales</h3>
-                                <p style="text-align: justify;">Ofrecemos acceso a mapas satelitales de alta resolución que proporcionan una
-                                    visión detallada y actualizada del mundo.</p>
+                                <i class="fas fa-globe"></i>
+                                <h3>Acceso a Información</h3>
+                                <p style="text-align: justify;">
+                                    Proporcionamos acceso rápido y confiable a directorios de emergencia, trámites y
+                                    servicios gubernamentales esenciales.
+                                </p>
                             </div>
                         </div>
                         <div class="col-md-6 padding-15 offset-top">
                             <div class="service-item box-shadow wow fadeInUp" data-wow-delay="500ms">
-                                <i class="flaticon-tanks"></i> <!-- Asumiendo que es adecuado para análisis de datos -->
+                                <i class="fas fa-chart-pie"></i>
                                 <h3>Análisis de Datos</h3>
-                                <p style="text-align: justify;">Nuestro equipo de expertos en análisis de datos utiliza técnicas avanzadas para
-                                    extraer información valiosa de grandes conjuntos de datos.</p>
+                                <p style="text-align: justify;">
+                                    Utilizamos datos en tiempo real para generar estadísticas e insights que apoyan la
+                                    toma de decisiones estratégicas y mejoran la gestión comunitaria.
+                                </p>
                             </div>
                         </div>
                     </div>

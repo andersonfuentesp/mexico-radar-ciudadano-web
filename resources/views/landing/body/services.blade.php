@@ -2,59 +2,69 @@
     <div class="dark-bg"></div>
     <div class="section-heading dark-background text-center mb-40 wow fadeInUp" data-wow-delay="100ms">
         <span>Servicios</span>
-        <h2>Descubre los mejores <br> servicios tecnológicos para ti</h2>
+        <h2>Conoce cómo <br> transformamos tu comunidad</h2>
     </div>
     <div class="container">
         <div class="row">
             <div class="col-lg-10 offset-lg-1">
                 <div id="service-carousel" class="service-carousel box-shadow owl-carousel">
+                    <!-- Servicio 1: Reportes Geolocalizados -->
                     <div class="service-item">
                         <div class="service-icon">
-                            <i class="fas fa-lightbulb"></i> <!-- FontAwesome Icon Updated -->
+                            <i class="fas fa-map-marker-alt"></i> <!-- FontAwesome Icon -->
                         </div>
-                        <h3>Innovación Tecnológica</h3>
-                        <p style="text-align: justify;">Implementamos las últimas tecnologías para desarrollar
-                            soluciones innovadoras que atienden las necesidades del mañana.</p>
+                        <h3>Reportes Geolocalizados</h3>
+                        <p style="text-align: justify;">
+                            Facilita reportes ciudadanos con geolocalización precisa, permitiendo a las autoridades actuar de manera rápida y eficiente.
+                        </p>
                         <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
                         <div class="overlay-icon" style="opacity: 0.02;">
-                            <i class="fas fa-lightbulb"></i> <!-- FontAwesome Icon Updated -->
-                        </div>
-                    </div>
-                    <div class="service-item">
-                        <div class="service-icon">
-                            <i class="fas fa-network-wired"></i> <!-- FontAwesome Icon Updated -->
-                        </div>
-                        <h3>Sistemas de Información</h3>
-                        <p style="text-align: justify;">Desarrollamos sistemas de información avanzados para optimizar
-                            procesos y mejorar la eficiencia y la toma de decisiones empresariales.</p>
-                        <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
-                        <div class="overlay-icon" style="opacity: 0.02;">
-                            <i class="fas fa-network-wired"></i> <!-- FontAwesome Icon Updated -->
-                        </div>
-                    </div>
-                    <div class="service-item">
-                        <div class="service-icon">
-                            <i class="fas fa-robot"></i> <!-- FontAwesome Icon Updated -->
-                        </div>
-                        <h3>Análisis de Datos</h3>
-                        <p style="text-align: justify;">Transformamos grandes volúmenes de datos en insights accionables
-                            para impulsar significativamente el crecimiento y la innovación estratégica.</p>
-                        <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
-                        <div class="overlay-icon" style="opacity: 0.02;">
-                            <i class="fas fa-robot"></i> <!-- FontAwesome Icon Updated -->
+                            <i class="fas fa-map-marker-alt"></i> <!-- FontAwesome Icon -->
                         </div>
                     </div>
 
+                    <!-- Servicio 2: Análisis en Tiempo Real -->
                     <div class="service-item">
                         <div class="service-icon">
-                            <i class="fas fa-globe"></i> <!-- FontAwesome Icon Updated -->
+                            <i class="fas fa-chart-line"></i> <!-- FontAwesome Icon -->
                         </div>
-                        <h3>Soluciones Geoespaciales</h3>
-                        <p style="text-align: justify;">Aplicamos tecnología geoespacial para ofrecer análisis detallado
-                            y soluciones de planificación avanzada.</p>
+                        <h3>Análisis en Tiempo Real</h3>
+                        <p style="text-align: justify;">
+                            Proporcionamos herramientas para analizar datos en tiempo real, optimizando la toma de decisiones estratégicas para la comunidad.
+                        </p>
                         <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
                         <div class="overlay-icon" style="opacity: 0.02;">
-                            <i class="fas fa-globe"></i> <!-- FontAwesome Icon Updated -->
+                            <i class="fas fa-chart-line"></i> <!-- FontAwesome Icon -->
+                        </div>
+                    </div>
+
+                    <!-- Servicio 3: Comunicación Ciudadana -->
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <i class="fas fa-share-alt"></i> <!-- FontAwesome Icon -->
+                        </div>
+                        <h3>Comunicación Ciudadana</h3>
+                        <p style="text-align: justify;">
+                            Creamos canales efectivos de comunicación entre ciudadanos y autoridades para resolver problemas comunitarios rápidamente.
+                        </p>
+                        <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
+                        <div class="overlay-icon" style="opacity: 0.02;">
+                            <i class="fas fa-share-alt"></i> <!-- FontAwesome Icon -->
+                        </div>
+                    </div>
+
+                    <!-- Servicio 4: Soluciones Tecnológicas -->
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <i class="fas fa-tools"></i> <!-- FontAwesome Icon -->
+                        </div>
+                        <h3>Soluciones Tecnológicas</h3>
+                        <p style="text-align: justify;">
+                            Ofrecemos tecnología avanzada para gestionar incidencias, optimizar procesos y mejorar la interacción entre ciudadanos y autoridades.
+                        </p>
+                        <a href="{{ route('website.servicios') }}" class="read-more">Leer Más</a>
+                        <div class="overlay-icon" style="opacity: 0.02;">
+                            <i class="fas fa-tools"></i> <!-- FontAwesome Icon -->
                         </div>
                     </div>
                 </div>
