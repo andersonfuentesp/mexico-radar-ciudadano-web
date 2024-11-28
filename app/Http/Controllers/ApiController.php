@@ -457,8 +457,12 @@ class ApiController extends Controller
                 return response()->json(['error' => 'No se encontró un servicio para listar números de emergencia en el municipio'], 404);
             }
 
-            // Construir la URL de la API
+            // Construir la URL de la API con parámetros de consulta
             $apiUrl = rtrim($contractedMunicipality->url, '/') . '/' . ltrim($municipalityService->api_url, '/');
+            $queryParams = [
+                'estado_id' => $municipioPol->EstadoPolId,
+                'municipio_id' => $municipioPol->MunicipioPolId,
+            ];
 
             // Preparar los headers con el token
             $headers = [
@@ -466,9 +470,9 @@ class ApiController extends Controller
                 'Content-Type' => 'application/json',
             ];
 
-            // Realizar la solicitud HTTP dependiendo del método
+            // Realizar la solicitud HTTP con los parámetros de consulta
             try {
-                $response = Http::withHeaders($headers)->get($apiUrl);
+                $response = Http::withHeaders($headers)->get($apiUrl, $queryParams);
 
                 if ($response->successful()) {
                     return response()->json($response->json());
