@@ -137,9 +137,16 @@
                             <td>{{ $report->EstadoNombre }}</td>
                             <td>{{ $report->MunicipioNombre }}</td>
                             <td>{{ $report->report_type_id }}</td>
-                            <td>{!! $report->report_address !!}</td>
+                            <!-- Dirección como ícono -->
+                            <td>
+                                <button type="button" class="btn btn-success" style="width: 45px; height: 40px;"
+                                    data-toggle="modal" data-target="#addressModal"
+                                    data-address="{{ strip_tags($report->report_address) }}"
+                                    data-map-url="https://www.google.com/maps?q={{ urlencode(strip_tags($report->report_address)) }}&output=embed">
+                                    <i class="fas fa-map-marker-alt" style="font-size: 1.5rem;"></i>
+                                </button>
+                            </td>
                             <td>{!! $report->report_comment !!}</td>
-                            <!-- Estatus con badge -->
                             <td>
                                 @if ($report->report_status_id == 'Completado')
                                     <span class="badge badge-success">{{ $report->report_status_id }}</span>
@@ -152,7 +159,6 @@
                                 @endif
                             </td>
                             <td>{{ \Carbon\Carbon::parse($report->report_registration_time)->format('d/m/Y H:i') }}</td>
-                            <!-- Columna con URL del municipio -->
                             <td>
                                 @if ($report->municipality_url)
                                     <a href="{{ $report->municipality_url }}" class="btn btn-warning" target="_blank"
@@ -172,7 +178,6 @@
                             </td>
                             <td>{{ $report->generated_from ?? 'No especificado' }}</td>
                             <td>
-                                <!-- Enlace a la ruta de detalle con encriptación -->
                                 <a href="{{ route('admin.reports.detail', [
                                     'report_id' => encrypt($report->report_id),
                                     'state_id' => encrypt($report->state_id),
@@ -187,9 +192,38 @@
                 </tbody>
             </table>
 
-            <!-- Paginación -->
             <div class="d-flex justify-content-center">
                 {{ $reports->appends(request()->query())->links() }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar dirección y mapa -->
+    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addressModalLabel">Dirección Completa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalAddressContent" style="margin-bottom: 15px;"></div>
+                    <iframe id="mapIframe" src="" style="border:0; width: 100%; height: 600px;"
+                        allowfullscreen></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary btn-sm" id="copyAddressButton"
+                        title="Copiar al Portapapeles">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm" id="shareLocationButton" title="Compartir Ubicación">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -222,6 +256,42 @@
                 } else {
                     municipioSelect.html('<option value="">Seleccione un municipio</option>');
                 }
+            });
+
+            $('#addressModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var address = button.data('address');
+                var mapUrl = button.data('map-url');
+                var modal = $(this);
+
+                modal.find('#modalAddressContent').html(address || 'No disponible');
+                modal.find('#mapIframe').attr('src', mapUrl);
+
+                $('#copyAddressButton').off('click').on('click', function() {
+                    navigator.clipboard.writeText(address).then(function() {
+                        alert('Dirección copiada al portapapeles.');
+                    }, function(err) {
+                        alert('Error al copiar la dirección.');
+                    });
+                });
+
+                $('#shareLocationButton').off('click').on('click', function() {
+                    var shareData = {
+                        title: 'Ubicación',
+                        text: 'Mira esta dirección: ' + address,
+                        url: mapUrl
+                    };
+                    if (navigator.share) {
+                        navigator.share(shareData).catch(err => console.log('Error al compartir:',
+                            err));
+                    } else {
+                        alert('La función de compartir no está soportada en este navegador.');
+                    }
+                });
+            });
+
+            $('#addressModal').on('hidden.bs.modal', function() {
+                $(this).find('#mapIframe').attr('src', '');
             });
         });
     </script>

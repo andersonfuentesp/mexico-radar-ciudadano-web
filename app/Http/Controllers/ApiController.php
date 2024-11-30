@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Mail\PasswordResetMail;
+use App\Mail\PasswordResetSuccessMail;
 use Illuminate\Support\Facades\Mail;
 
 class ApiController extends Controller
@@ -1685,6 +1686,10 @@ class ApiController extends Controller
 
             // Eliminar el código después de usarlo
             DB::table('mobile_password_resets')->where('email', $validated['email'])->delete();
+
+            // Enviar notificación por correo
+            $user = DB::table('mobile_users')->where('email', $validated['email'])->first();
+            Mail::to($validated['email'])->send(new PasswordResetSuccessMail($user));
 
             return response()->json(['message' => 'Contraseña restablecida exitosamente'], 200);
         } catch (\Exception $e) {
