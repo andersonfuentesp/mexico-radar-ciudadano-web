@@ -20,6 +20,9 @@ class ImageHelper
         // Cargar la imagen usando Intervention Image
         $img = Image::make($image);
 
+        // Ajustar la orientación según los metadatos EXIF
+        $img->orientate();
+
         // Redimensionar la imagen a las medidas proporcionadas
         $img->fit($width, $height, function ($constraint) {
             $constraint->aspectRatio();
@@ -34,7 +37,7 @@ class ImageHelper
 
     public static function storeFile($pdf, $folder)
     {
-        $originalName= $pdf->getClientOriginalName();
+        $originalName = $pdf->getClientOriginalName();
         $filename = self::sanitizeFileName(now()->format('Ymd_His') . '_' . $originalName);
         $path = public_path('uploads/' . $folder);
 
