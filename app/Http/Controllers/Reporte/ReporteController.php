@@ -554,7 +554,11 @@ class ReporteController extends Controller
                     'state_id' => $municipioPol->EstadoPolId,
                     'municipality_id' => $municipioPol->MunicipioPolId
                 ]);
-                return response()->json(['error' => 'No se encontró un municipio contratado para las coordenadas proporcionadas'], 404);
+
+                // Retornar vista alternativa con datos mínimos del reporte
+                return view('app.reports.detail_minimal', [
+                    'mobileReport' => $mobileReport // Pasar los datos del reporte móvil si existen
+                ]);
             }
 
             // 4. Buscar en la tabla municipality_services filtrando por service_name = 'Obtener datos de reporte'
