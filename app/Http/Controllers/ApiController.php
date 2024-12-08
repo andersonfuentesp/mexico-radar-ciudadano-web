@@ -645,7 +645,6 @@ class ApiController extends Controller
             }
 
             // Consultar MunicipioPol fuera de la transacción
-            // Consultar todos los campos de MunicipioPol, usando MunicipioPolGeoPolygon en lugar de MunicipioPolChar
             Log::info('Consultando MunicipioPol usando MunicipioPolGeoPolygon...');
             $municipioPol = DB::table('municipiopol')
                 ->select(
@@ -655,7 +654,6 @@ class ApiController extends Controller
                     'MunicipioPolPoligono',
                     'MunicipioPolChar',
                     'MunicipioPolKml',
-                    //'MunicipioPolGeography',
                     'MunicipioPolGeoPolygon'
                 )
                 ->whereRaw("ST_Contains(MunicipioPolGeoPolygon, ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326))")
@@ -665,7 +663,6 @@ class ApiController extends Controller
                 Log::warning('No se encontró municipio para las coordenadas proporcionadas');
                 return response()->json(['message' => 'No municipality found for the provided coordinates'], 200);
             }
-            //Log::info('Municipio encontrado:', ['municipio' => $municipioPol]);
 
             // Buscar en la tabla contracted_municipalities fuera de la transacción
             Log::info('Consultando contracted_municipalities...');
@@ -679,14 +676,19 @@ class ApiController extends Controller
             $generatedReportId = Str::uuid();
             Log::info('ID de reporte generado:', ['report_id' => $generatedReportId]);
 
+            // Declaramos $newFolio antes de la transacción
+            $newFolio = null;
+
             // Transacción para la inserción en la base de datos
-            DB::transaction(function () use ($validated, $request, $generatedReportId, $municipioPol, $contractedMunicipality) {
+            DB::transaction(function () use ($validated, $request, $generatedReportId, $municipioPol, $contractedMunicipality, &$newFolio) {
                 Log::info('Iniciando transacción para el guardado del reporte...');
 
-                // Obtener el último folio y calcular nuevo
-                $lastFolio = DB::table('reports')->max('report_folio');
-                $newFolio = $lastFolio ? $lastFolio + 1 : 100000;
-                Log::info('Folio de reporte calculado:', ['folio' => $newFolio]);
+                // Obtener el último folio para ese municipio y calcular el nuevo folio
+                $lastFolio = DB::table('reports')
+                    ->where('municipality_id', $municipioPol->MunicipioPolId)
+                    ->max('report_folio');
+                $newFolio = $lastFolio ? $lastFolio + 1 : 1;
+                Log::info('Folio de reporte calculado (agrupado por municipio):', ['folio' => $newFolio]);
 
                 // Guardar imágenes si están presentes
                 $reportedPhotoPath = $request->hasFile('reported_photo')
@@ -764,7 +766,6 @@ class ApiController extends Controller
 
                 $headers = [
                     'Authorization' => 'Bearer ' . $contractedMunicipality->token,
-                    //'Content-Type' => 'multipart/form-data',
                 ];
                 Log::info('Encabezados de la solicitud:', $headers);
 
@@ -781,6 +782,7 @@ class ApiController extends Controller
                     'phone' => $validated['phone'],
                     'email' => $validated['email'],
                     'gps_location' => $validated['gps_location'],
+                    'folio' => $newFolio
                 ];
                 Log::info('Datos enviados en la solicitud:', $data);
 
