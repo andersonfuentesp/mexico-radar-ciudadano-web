@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('contact_email', 100)->nullable(); // Email of the contact person
             $table->string('contact_phone1', 15); // Phone number of the contact person
             $table->string('contact_phone2', 15)->nullable(); // Secondary phone number (optional)
+            $table->boolean('is_private')->default(false); // Indicates if the municipality is private
             $table->boolean('status')->default(true); // Status of the contract (active or inactive)
             $table->timestamps(); // Created at and updated at timestamps
 

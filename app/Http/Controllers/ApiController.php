@@ -1471,10 +1471,20 @@ class ApiController extends Controller
     public function loginUser(Request $request)
     {
         try {
-            // Validación de las credenciales
+            // Validación de las credenciales obligatorias
             $validated = $request->validate([
                 'email' => 'required|string|email|max:100',
                 'password' => 'required|string',
+            ]);
+
+            // Validación adicional para los parámetros opcionales
+            $optionalData = $request->only([
+                'device_id',
+                'mobile_model',
+                'os_version',
+                'app_version',
+                'network_type',
+                'imei',
             ]);
 
             // Buscar el usuario por el correo
@@ -1486,9 +1496,13 @@ class ApiController extends Controller
 
             // Generar un token para la sesión
             $token = Str::random(60);
+
+            // Actualizar los campos opcionales y el token si existen
+            $updateData = array_merge(['remember_token' => $token], $optionalData);
+
             DB::table('mobile_users')
                 ->where('email', $validated['email'])
-                ->update(['remember_token' => $token]);
+                ->update($updateData);
 
             return response()->json([
                 'message' => 'Inicio de sesión exitoso',
@@ -1702,5 +1716,253 @@ class ApiController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function isPrivateMunicipality(Request $request)
+    {
+        $validatedData = $request->validate([
+            'state_id' => 'required|integer|exists:contracted_municipalities,state_id',
+            'municipality_id' => 'required|integer|exists:contracted_municipalities,municipality_id',
+        ]);
+
+        $stateId = $validatedData['state_id'];
+        $municipalityId = $validatedData['municipality_id'];
+
+        $municipality = DB::table('contracted_municipalities')
+            ->where('state_id', $stateId)
+            ->where('municipality_id', $municipalityId)
+            ->first();
+
+        if (!$municipality) {
+            return response()->json(['message' => 'Municipio no encontrado'], 404);
+        }
+
+        return response()->json([
+            'municipality' => $municipality->name,
+            'is_private' => $municipality->is_private,
+        ], 200);
+    }
+
+    public function asociation(Request $request)
+    {
+        // Validar que el municipio y estado sean válidos
+        $validatedData = $request->validate([
+            'state_id' => 'required|integer|exists:contracted_municipalities,state_id',
+            'municipality_id' => 'required|integer|exists:contracted_municipalities,municipality_id',
+        ]);
+
+        // Obtener las asociaciones activas para el estado y municipio proporcionados
+        $associations = DB::table('mobile_user_locations')
+            ->join('mobile_users', 'mobile_user_locations.user_id', '=', 'mobile_users.user_id')
+            ->join('estado', 'mobile_user_locations.state_id', '=', 'estado.EstadoId')
+            ->join('municipio', function ($join) {
+                $join->on('mobile_user_locations.state_id', '=', 'municipio.EstadoId')
+                    ->on('mobile_user_locations.municipality_id', '=', 'municipio.MunicipioId');
+            })
+            ->where('mobile_user_locations.state_id', $validatedData['state_id'])
+            ->where('mobile_user_locations.municipality_id', $validatedData['municipality_id'])
+            ->where('mobile_user_locations.is_active', 1) // Filtro para asociaciones activas
+            ->select(
+                'mobile_user_locations.id',
+                'mobile_users.name as user_name',
+                'mobile_users.email',
+                'mobile_users.phone',
+                'mobile_users.address',
+                'mobile_users.occupation',
+                'mobile_users.device_id',
+                'mobile_users.mobile_model',
+                'mobile_users.os_version',
+                'mobile_users.app_version',
+                'mobile_users.network_type',
+                'mobile_users.imei',
+                'estado.EstadoNombre as state_name',
+                'municipio.MunicipioNombre as municipality_name',
+                'mobile_user_locations.created_at'
+            )
+            ->get();
+
+        return response()->json($associations, 200);
+    }
+
+    public function asociationStore(Request $request)
+    {
+        try {
+            // Validar los datos de entrada
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:100',
+                'email' => 'required|email|max:100|unique:mobile_users,email',
+                'password' => 'required|string|min:8',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'occupation' => 'nullable|string|max:100',
+                'state_id' => 'required|exists:estado,EstadoId',
+                'municipality_id' => 'required|exists:municipio,MunicipioId',
+            ]);
+
+            // Iniciar una transacción para asegurar la consistencia de los datos
+            DB::beginTransaction();
+
+            // Registrar el nuevo usuario en la tabla 'mobile_users'
+            $userId = DB::table('mobile_users')->insertGetId([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']), // Hashear la contraseña
+                'phone' => $validatedData['phone'] ?? null,
+                'address' => $validatedData['address'] ?? null,
+                'occupation' => $validatedData['occupation'] ?? null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Verificar si ya existe la asociación en 'mobile_user_locations'
+            $existingAssociation = DB::table('mobile_user_locations')
+                ->where('user_id', $userId)
+                ->where('state_id', $validatedData['state_id'])
+                ->where('municipality_id', $validatedData['municipality_id'])
+                ->first();
+
+            if ($existingAssociation) {
+                // Si ya existe, revertir la transacción
+                DB::rollBack();
+                return response()->json(['message' => 'La asociación ya existe.'], 409); // Código 409: Conflicto
+            }
+
+            // Insertar la nueva asociación en 'mobile_user_locations' con is_active = 1
+            DB::table('mobile_user_locations')->insert([
+                'user_id' => $userId,
+                'state_id' => $validatedData['state_id'],
+                'municipality_id' => $validatedData['municipality_id'],
+                'is_active' => 1, // Activo por defecto
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Confirmar la transacción
+            DB::commit();
+
+            return response()->json(['message' => 'Usuario y asociación creados exitosamente.'], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Capturar errores de validación y retornar en formato JSON
+            return response()->json([
+                'message' => 'Error de validación.',
+                'errors' => $e->errors(),
+            ], 422); // Código 422: Unprocessable Entity
+        } catch (\Exception $e) {
+            // En caso de error general, revertir la transacción
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error al crear el usuario y la asociación.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function asociationDelete($id)
+    {
+        // Buscar la asociación en 'mobile_user_locations'
+        $association = DB::table('mobile_user_locations')->where('id', $id)->first();
+
+        if (!$association) {
+            return response()->json(['message' => 'Asociación no encontrada'], 404);
+        }
+
+        // Actualizar el estado de 'is_active' a 0 en lugar de eliminar
+        DB::table('mobile_user_locations')->where('id', $id)->update([
+            'is_active' => 0, // Desactivar la asociación
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'Asociación desactivada exitosamente'], 200);
+    }
+
+    public function asociationAvailableUsers(Request $request)
+    {
+        // Validar que el municipio y estado sean válidos
+        $validatedData = $request->validate([
+            'state_id' => 'required|integer|exists:contracted_municipalities,state_id',
+            'municipality_id' => 'required|integer|exists:contracted_municipalities,municipality_id',
+        ]);
+
+        // Obtener los usuarios disponibles (is_active = 0) para el estado y municipio proporcionados
+        $availableUsers = DB::table('mobile_user_locations')
+            ->join('mobile_users', 'mobile_user_locations.user_id', '=', 'mobile_users.user_id')
+            ->join('estado', 'mobile_user_locations.state_id', '=', 'estado.EstadoId')
+            ->join('municipio', function ($join) {
+                $join->on('mobile_user_locations.state_id', '=', 'municipio.EstadoId')
+                    ->on('mobile_user_locations.municipality_id', '=', 'municipio.MunicipioId');
+            })
+            ->where('mobile_user_locations.state_id', $validatedData['state_id'])
+            ->where('mobile_user_locations.municipality_id', $validatedData['municipality_id'])
+            ->where('mobile_user_locations.is_active', 0) // Filtro para usuarios disponibles
+            ->select(
+                'mobile_user_locations.id',
+                'mobile_users.user_id',
+                'mobile_users.name as user_name',
+                'mobile_users.email',
+                'mobile_users.phone',
+                'mobile_users.address',
+                'mobile_users.occupation',
+                'mobile_users.device_id',
+                'mobile_users.mobile_model',
+                'mobile_users.os_version',
+                'mobile_users.app_version',
+                'mobile_users.network_type',
+                'mobile_users.imei',
+                'estado.EstadoNombre as state_name',
+                'municipio.MunicipioNombre as municipality_name',
+                'mobile_user_locations.created_at'
+            )
+            ->get();
+
+        return response()->json($availableUsers, 200);
+    }
+
+    public function asociationReactivate(Request $request)
+    {
+        // Registrar todos los datos recibidos del request
+        Log::info('Datos recibidos en la solicitud de reactivación de asociación:', $request->all());
+
+        // Validar los datos de entrada
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:mobile_users,user_id', // Verifica que el usuario exista en mobile_users
+            'state_id' => 'required|exists:estado,EstadoId',     // Verifica que el estado exista
+            'municipality_id' => 'required|exists:municipio,MunicipioId', // Verifica que el municipio exista
+        ]);
+
+        // Registrar datos validados
+        Log::info('Datos validados:', $validatedData);
+
+        // Buscar la asociación inactiva
+        $association = DB::table('mobile_user_locations')
+            ->where('user_id', $validatedData['user_id'])
+            ->where('state_id', $validatedData['state_id'])
+            ->where('municipality_id', $validatedData['municipality_id'])
+            ->where('is_active', 0) // Debe estar inactiva
+            ->first();
+
+        if (!$association) {
+            Log::warning('No se encontró una asociación inactiva.', [
+                'user_id' => $validatedData['user_id'],
+                'state_id' => $validatedData['state_id'],
+                'municipality_id' => $validatedData['municipality_id'],
+            ]);
+            return response()->json(['message' => 'No se encontró una asociación inactiva para este usuario, estado y municipio.'], 404);
+        }
+
+        // Registrar que se encontró la asociación inactiva
+        Log::info('Asociación encontrada:', (array) $association);
+
+        // Reactivar la asociación configurando is_active = 1
+        DB::table('mobile_user_locations')
+            ->where('id', $association->id)
+            ->update([
+                'is_active' => 1,
+                'updated_at' => now(),
+            ]);
+
+        // Registrar que la asociación fue reactivada
+        Log::info('Asociación reactivada exitosamente.', ['association_id' => $association->id]);
+
+        return response()->json(['message' => 'Asociación reactivada exitosamente.'], 200);
     }
 }

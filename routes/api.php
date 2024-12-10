@@ -50,6 +50,14 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/mobile-user/forgot-password', 'forgotPassword'); // Solicitar recuperación de contraseña
     Route::post('/mobile-user/verify-code', 'verifyCode'); // Verificar el código ingresado
     Route::post('/mobile-user/reset-password', 'resetPassword');  // Restablecer contraseña con el token
+
+    Route::post('/is-private-municipality', 'isPrivateMunicipality');
+    Route::post('/asociation', 'asociation'); // Listar asociaciones (cambiado a POST)
+    Route::post('/asociation/store', 'asociationStore'); // Agregar una nueva asociación
+    Route::delete('/asociation/delete/{id}', 'asociationDelete'); // Eliminar una asociación
+
+    Route::post('/asociation/available-users', 'asociationAvailableUsers'); // Listar usuarios disponibles
+    Route::post('/asociation/reactivate', 'asociationReactivate'); // Reactivar una asociación existente
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -37,7 +37,8 @@
                         <th>Municipio</th>
                         <th>Fecha de Contrato</th>
                         <th>Estado del Contrato</th>
-                        <th>Cantidad de Servicios</th> <!-- Nueva columna -->
+                        <th>Privacidad</th> <!-- Nueva columna para mostrar si es privado -->
+                        <th>Cantidad de Servicios</th>
                         <th>Aplicación/Web</th>
                         <th>Acciones</th>
                     </tr>
@@ -57,6 +58,15 @@
                                     <span class="badge badge-success">Activo</span>
                                 @else
                                     <span class="badge badge-danger">Inactivo</span>
+                                @endif
+                            </td>
+
+                            <!-- Badge para indicar si es privado o público -->
+                            <td>
+                                @if ($municipality->is_private)
+                                    <span class="badge badge-warning">Privado</span>
+                                @else
+                                    <span class="badge badge-primary">Público</span>
                                 @endif
                             </td>
 

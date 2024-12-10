@@ -42,6 +42,7 @@ class ContractedMunicipalityController extends Controller
                 'contracted_municipalities.municipality_id',
                 'contracted_municipalities.contract_date',
                 'contracted_municipalities.status',
+                'contracted_municipalities.is_private',
                 'contracted_municipalities.url',
                 'estado.EstadoNombre',
                 'municipio.MunicipioNombre',
@@ -54,6 +55,7 @@ class ContractedMunicipalityController extends Controller
                 'contracted_municipalities.municipality_id',
                 'contracted_municipalities.contract_date',
                 'contracted_municipalities.status',
+                'contracted_municipalities.is_private',
                 'contracted_municipalities.url',
                 'estado.EstadoNombre',
                 'municipio.MunicipioNombre'
@@ -87,6 +89,21 @@ class ContractedMunicipalityController extends Controller
             'token' => 'nullable|string|max:255', // Validación del token
         ]);
 
+        // Verificar si ya existe un registro con el mismo estado y municipio
+        $existingMunicipality = ContractedMunicipality::where('state_id', $request->state_id)
+            ->where('municipality_id', $request->municipality_id)
+            ->first();
+
+        if ($existingMunicipality) {
+            $notification = [
+                'message' => 'El municipio ya está registrado para este estado.',
+                'alert-type' => 'info',
+            ];
+
+            return redirect()->route('admin.contractedMunicipality.add')->with($notification);
+        }
+
+        // Crear nuevo registro
         $data = new ContractedMunicipality();
         $data->name = $request->name;
         $data->state_id = $request->state_id;
@@ -102,6 +119,7 @@ class ContractedMunicipalityController extends Controller
         $data->token = $request->token; // Almacenamiento del token
         $data->contract_number = $request->contract_number;
         $data->status = $request->status ?? true;
+        $data->is_private = $request->has('is_private'); // Captura del checkbox
         $data->save();
 
         $notification = [
@@ -170,6 +188,21 @@ class ContractedMunicipalityController extends Controller
         // Buscar el municipio contratado por ID
         $data = ContractedMunicipality::findOrFail($id);
 
+        // Verificar si ya existe otro registro con el mismo estado y municipio
+        $existingMunicipality = ContractedMunicipality::where('state_id', $request->state_id)
+            ->where('municipality_id', $request->municipality_id)
+            ->where('id', '!=', $id) // Excluir el registro actual
+            ->first();
+
+        if ($existingMunicipality) {
+            $notification = [
+                'message' => 'Ya existe un registro para este estado y municipio.',
+                'alert-type' => 'warning',
+            ];
+
+            return redirect()->route('admin.contractedMunicipality.edit', encrypt($id))->with($notification);
+        }
+
         // Actualizar los datos del municipio contratado
         $data->name = $request->name;
         $data->state_id = $request->state_id;
@@ -185,6 +218,7 @@ class ContractedMunicipalityController extends Controller
         $data->token = $request->token; // Actualización del token
         $data->contract_number = $request->contract_number;
         $data->status = $request->status ?? true; // Actualizar estado del contrato (activo/inactivo)
+        $data->is_private = $request->has('is_private'); // Actualizar si el municipio es privado
 
         // Guardar los cambios
         $data->save();

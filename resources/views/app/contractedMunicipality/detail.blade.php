@@ -30,84 +30,119 @@
 
         <div class="card-body">
             <!-- Información General -->
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Nombre del Municipio:</strong></h6>
-                        <p>{{ $municipality->name }}</p>
-                    </div>
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Información General</h5>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Estado:</strong></h6>
-                        <p>{{ $municipality->EstadoNombre }}</p>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Nombre del Municipio:</strong></h6>
+                                <p>{{ $municipality->name }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Estado:</strong></h6>
+                                <p>{{ $municipality->EstadoNombre }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Municipio:</strong></h6>
+                                <p>{{ $municipality->MunicipioNombre }}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Municipio:</strong></h6>
-                        <p>{{ $municipality->MunicipioNombre }}</p>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Fecha de Contrato:</strong></h6>
+                                <p>{{ \Carbon\Carbon::parse($municipality->contract_date)->format('d/m/Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Responsable de Contacto:</strong></h6>
+                                <p>{{ $municipality->contact_responsible }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Privacidad:</strong></h6>
+                                @if ($municipality->is_private)
+                                    <span class="badge badge-warning">Privado</span>
+                                @else
+                                    <span class="badge badge-primary">Público</span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Fecha de Contrato:</strong></h6>
-                        <p>{{ \Carbon\Carbon::parse($municipality->contract_date)->format('d/m/Y') }}</p>
-                    </div>
+            <!-- Información de Contacto -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">Información de Contacto</h5>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Responsable de Contacto:</strong></h6>
-                        <p>{{ $municipality->contact_responsible }}</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Email de Contacto:</strong></h6>
-                        <p>{{ $municipality->contact_email ?? 'No disponible' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Teléfono de Contacto:</strong></h6>
-                        <p>{{ $municipality->contact_phone1 }}</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="p-2 border rounded h-100 text-center">
-                        <h6><strong>URL del Municipio:</strong></h6>
-                        @if ($municipality->url)
-                            <a href="{{ $municipality->url }}" class="btn btn-primary" target="_blank">
-                                <i class="fas fa-external-link-alt"></i> Visitar Web
-                            </a>
-                        @else
-                            <p>No disponible</p>
-                        @endif
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Teléfono de Contacto:</strong></h6>
+                                <p>{{ $municipality->contact_phone1 }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Email de Contacto:</strong></h6>
+                                <p>{{ $municipality->contact_email ?? 'No disponible' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="p-2 border rounded h-100 text-center">
+                                <h6><strong>URL del Municipio:</strong></h6>
+                                @if ($municipality->url)
+                                    <a href="{{ $municipality->url }}" class="btn btn-primary" target="_blank">
+                                        <i class="fas fa-external-link-alt"></i> Visitar Web
+                                    </a>
+                                @else
+                                    <p>No disponible</p>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sección para el token del municipio contratado -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Token de Autenticación:</strong></h6>
-                        <p>{{ $municipality->token ?? 'No disponible' }}</p>
-                    </div>
+            <!-- Detalles Adicionales -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Detalles Adicionales</h5>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <div class="p-2 border rounded h-100">
-                        <h6><strong>Descripción:</strong></h6>
-                        <p>{{ $municipality->description ?? 'No disponible' }}</p>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Token de Autenticación:</strong></h6>
+                                <p>{{ $municipality->token ?? 'No disponible' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Número de Contrato:</strong></h6>
+                                <p>{{ $municipality->contract_number ?? 'No disponible' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="p-2 border rounded h-100">
+                                <h6><strong>Descripción:</strong></h6>
+                                <p>{{ $municipality->description ?? 'No disponible' }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

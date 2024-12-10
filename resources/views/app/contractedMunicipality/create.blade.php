@@ -141,6 +141,13 @@
                             <input type="text" name="contact_position" class="form-control"
                                 placeholder="Cargo del responsable">
                         </div>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="isPrivate" name="is_private">
+                                <label class="custom-control-label" for="isPrivate">Municipio Privado</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

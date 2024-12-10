@@ -26,89 +26,97 @@
         <div class="card-body">
             <input type="hidden" id="municipiosRoute" value="{{ route('admin.utilitie.getMunicipiosByEstado', '') }}">
 
-            <!-- Grid de búsqueda -->
-            <div class="d-flex justify-content-between mb-3">
-                <div>
-                    <form action="{{ route('admin.reports.all') }}" method="GET" class="form-inline">
-                        <div class="form-row align-items-center custom-form-row">
-                            <!-- Estado -->
-                            <div class="col-auto" style="width: 230px;">
-                                <select name="estado_id" id="StateId" class="form-control select2" required>
-                                    <option value="">Seleccione un estado</option>
-                                    @foreach ($states as $state)
-                                        <option value="{{ $state->EstadoId }}"
-                                            {{ request()->get('estado_id') == $state->EstadoId ? 'selected' : '' }}>
-                                            {{ $state->EstadoNombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <!-- Municipio -->
-                            <div class="col-auto" style="width: 250px;">
-                                <select name="municipio_id" id="MunicipalityId" class="form-control select2" required>
-                                    <option value="">Seleccione un municipio</option>
-                                    @if (!empty($municipios))
-                                        @foreach ($municipios as $municipio)
-                                            <option value="{{ $municipio->MunicipioId }}"
-                                                {{ request()->get('municipio_id') == $municipio->MunicipioId ? 'selected' : '' }}>
-                                                {{ $municipio->MunicipioNombre }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                            <!-- Tipo de reporte -->
-                            <div class="col-auto">
-                                <select name="report_type" id="report_type" class="form-control">
-                                    <option value="">Selecciona Tipo de Reporte</option>
-                                    @foreach ($reportTypes as $type)
-                                        <option value="{{ $type }}"
-                                            {{ request()->get('report_type') == $type ? 'selected' : '' }}>
-                                            {{ $type }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <!-- Fechas -->
-                            <div class="col-auto">
-                                <input type="date" name="search_start" id="search_start" class="form-control"
-                                    value="{{ request()->get('search_start') }}">
-                            </div>
-                            <div class="col-auto">
-                                <input type="date" name="search_end" id="search_end" class="form-control"
-                                    value="{{ request()->get('search_end') }}">
-                            </div>
-                            <!-- Estatus -->
-                            <div class="col-auto">
-                                <select name="search_status_name" id="search_status_name" class="form-control">
-                                    <option value="">Selecciona Estatus</option>
-                                    @foreach ($reportStatuses as $status)
-                                        <option value="{{ $status }}"
-                                            {{ request()->get('search_status_name') == $status ? 'selected' : '' }}>
-                                            {{ $status }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <!-- Contratado -->
-                            <div class="col-auto">
-                                <select name="contratado" id="contratado" class="form-control">
-                                    <option value="">¿Contratado?</option>
-                                    <option value="1" {{ request()->get('contratado') == '1' ? 'selected' : '' }}>Sí
+            <form action="{{ route('admin.reports.all') }}" method="GET" class="form-horizontal">
+                <div class="row align-items-end">
+                    <!-- Estado -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <select name="estado_id" id="StateId" class="form-control select2" required>
+                            <option value="">-- Estado --</option>
+                            @foreach ($states as $state)
+                                <option value="{{ $state->EstadoId }}"
+                                    {{ request()->get('estado_id') == $state->EstadoId ? 'selected' : '' }}>
+                                    {{ $state->EstadoNombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Municipio -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <select name="municipio_id" id="MunicipalityId" class="form-control select2" required>
+                            <option value="">-- Municipio --</option>
+                            @if (!empty($municipios))
+                                @foreach ($municipios as $municipio)
+                                    <option value="{{ $municipio->MunicipioId }}"
+                                        {{ request()->get('municipio_id') == $municipio->MunicipioId ? 'selected' : '' }}>
+                                        {{ $municipio->MunicipioNombre }}
                                     </option>
-                                    <option value="0" {{ request()->get('contratado') == '0' ? 'selected' : '' }}>No
-                                    </option>
-                                </select>
-                            </div>
-                            <!-- Botón de búsqueda -->
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-custom mb-2"><i class="fas fa-search"></i>
-                                    Buscar</button>
-                            </div>
-                        </div>
-                    </form>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <!-- Tipo de reporte -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <select name="report_type" id="report_type" class="form-control select2">
+                            <option value="">-- Tipo de Reporte --</option>
+                            @foreach ($reportTypes as $type)
+                                <option value="{{ $type }}"
+                                    {{ request()->get('report_type') == $type ? 'selected' : '' }}>
+                                    {{ $type }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Folio -->
+                    <div class="col-lg-1 col-md-2 col-12 mb-3">
+                        <input type="text" name="report_folio" id="report_folio" class="form-control" placeholder="Folio"
+                            value="{{ request()->get('report_folio') }}">
+                    </div>
+
+                    <!-- Fecha Inicio -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <input type="date" name="search_start" id="search_start" class="form-control"
+                            value="{{ request()->get('search_start') }}">
+                    </div>
+
+                    <!-- Fecha Fin -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <input type="date" name="search_end" id="search_end" class="form-control"
+                            value="{{ request()->get('search_end') }}">
+                    </div>
+
+                    <!-- Estatus -->
+                    <div class="col-lg-1 col-md-2 col-12 mb-3">
+                        <select name="search_status_name" id="search_status_name" class="form-control select2">
+                            <option value="">-- Estatus --</option>
+                            @foreach ($reportStatuses as $status)
+                                <option value="{{ $status }}"
+                                    {{ request()->get('search_status_name') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Contratado -->
+                    <div class="col-lg-1-5 col-md-2 col-12 mb-3">
+                        <select name="contratado" id="contratado" class="form-control select2">
+                            <option value="">¿Contratado?</option>
+                            <option value="1" {{ request()->get('contratado') == '1' ? 'selected' : '' }}>Sí</option>
+                            <option value="0" {{ request()->get('contratado') == '0' ? 'selected' : '' }}>No</option>
+                        </select>
+                    </div>
+
+                    <!-- Botón de búsqueda -->
+                    <div class="col-md-auto col-12 mb-3">
+                        <button type="submit" class="btn btn-custom w-100">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Tabla de reportes ciudadanos -->
             <table id="datatable" class="table table-striped table-bordered">
@@ -116,6 +124,7 @@
                     <tr>
                         <th>#</th>
                         <th>ID</th>
+                        <th>Folio</th>
                         <th>Estado</th>
                         <th>Municipio</th>
                         <th>Tipo de Reporte</th>
@@ -134,10 +143,10 @@
                         <tr>
                             <td>{{ ($reports->currentPage() - 1) * $reports->perPage() + $key + 1 }}</td>
                             <td>{{ $report->report_id }}</td>
+                            <td>{{ $report->report_folio }}</td>
                             <td>{{ $report->EstadoNombre }}</td>
                             <td>{{ $report->MunicipioNombre }}</td>
                             <td>{{ $report->report_type_id }}</td>
-                            <!-- Dirección como ícono -->
                             <td>
                                 <button type="button" class="btn btn-success" style="width: 45px; height: 40px;"
                                     data-toggle="modal" data-target="#addressModal"

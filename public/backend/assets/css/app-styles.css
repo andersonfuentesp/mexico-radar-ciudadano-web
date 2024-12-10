@@ -280,3 +280,15 @@ body {
 .logo-xs {
     display: none;
 }
+
+.col-lg-1-5 {
+    flex: 0 0 12.5%;
+    max-width: 12.5%;
+}
+
+@media (max-width: 768px) {
+    .col-lg-1-5 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}

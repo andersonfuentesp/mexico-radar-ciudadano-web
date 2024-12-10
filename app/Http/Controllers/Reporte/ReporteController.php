@@ -33,7 +33,6 @@ class ReporteController extends Controller
         $reportTypes = [];
 
         try {
-            // Consultar los municipios que tienen el servicio "Listar tipo de reporte"
             $municipalitiesForReportTypes = DB::table('contracted_municipalities')
                 ->leftJoin('municipality_services', 'contracted_municipalities.id', '=', 'municipality_services.municipality_id')
                 ->where('municipality_services.service_name', 'Listar tipo de reporte')
@@ -63,7 +62,6 @@ class ReporteController extends Controller
 
             $reportTypes = array_unique($reportTypes);
         } catch (\Exception $e) {
-            // Si ocurre un error, obtener los tipos de reporte desde la base de datos
             $reportTypes = DB::table('report_types')
                 ->where('ReportTypeIsActive', true)
                 ->orderBy('ReportTypeOrderPriority')
@@ -104,13 +102,12 @@ class ReporteController extends Controller
 
             $reportStatuses = array_unique($reportStatuses);
         } catch (\Exception $e) {
-            // Si ocurre un error, obtener los estatus de reporte desde la base de datos
             $reportStatuses = DB::table('report_statuses')
                 ->pluck('report_status_name')
                 ->toArray();
         }
 
-        // Construir la consulta base de reportes con orden por report_reported_time y respaldo en report_registration_time
+        // Construir la consulta base de reportes
         $reportsQuery = DB::table('reports')
             ->leftJoin('estado', 'reports.state_id', '=', 'estado.EstadoId')
             ->leftJoin('municipio', function ($join) {
@@ -140,7 +137,7 @@ class ReporteController extends Controller
                 'municipio.MunicipioNombre',
                 'contracted_municipalities.url as municipality_url'
             )
-            ->orderByRaw('COALESCE(reports.report_reported_time, reports.report_registration_time) DESC'); // Usar el respaldo si es null
+            ->orderByRaw('COALESCE(reports.report_reported_time, reports.report_registration_time) DESC');
 
         if ($request->filled('estado_id')) {
             $reportsQuery->where('reports.state_id', $request->estado_id);
@@ -165,6 +162,11 @@ class ReporteController extends Controller
 
         if ($request->filled('contratado')) {
             $reportsQuery->where('reports.is_contracted_municipality', $request->contratado);
+        }
+
+        // Nuevo filtro: Folio
+        if ($request->filled('report_folio')) {
+            $reportsQuery->where('reports.report_folio', $request->report_folio);
         }
 
         $reports = $reportsQuery->paginate(100);
