@@ -22,6 +22,7 @@ Route::controller(ApiController::class)->group(function () {
 
     Route::get('/noticias', 'getNoticias');
     Route::get('/tramites', 'getTramites');
+    Route::get('/directorios', 'getDirectorios');
     Route::get('/terms', 'getTerms');
     Route::get('/numeros', 'getEmergencyNumbers');
     Route::get('/emergency-numbers-by-location', 'getEmergencyNumbersByLocation');

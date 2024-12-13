@@ -126,5 +126,15 @@ class MunicipalityServicesSeeder extends Seeder
             'status' => true,
         ]);
 
+        MunicipalityService::create([
+            'municipality_id' => 1,
+            'api_url' => '/api/directorios',
+            'method' => 'GET',
+            'response_format' => 'JSON',
+            'service_name' => 'Listar directorios',
+            'description' => 'Servicio para obtener directorios',
+            'status' => true,
+        ]);
+
     }
 }

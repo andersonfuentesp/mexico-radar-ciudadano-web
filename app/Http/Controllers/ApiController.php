@@ -245,6 +245,92 @@ class ApiController extends Controller
     }
 
     /**
+     * Obtener los directorios del municipio.
+     *
+     * @param Request $request Contiene los parámetros 'estado_id', 'municipio_id' y el filtro opcional 'search_dependencia'.
+     * @return \Illuminate\Http\JsonResponse Respuesta en JSON con los directorios o un mensaje de error.
+     * @throws \Illuminate\Validation\ValidationException Si los parámetros son inválidos.
+     */
+    public function getDirectorios(Request $request)
+    {
+        // Validar que se hayan enviado los parámetros obligatorios
+        $request->validate([
+            'estado_id' => 'required|integer|exists:estado,EstadoId',
+            'municipio_id' => 'required|integer|exists:municipio,MunicipioId',
+        ]);
+
+        // 1. Buscar el polígono del municipio usando el estado y municipio proporcionados
+        $municipioPol = DB::table('municipiopol')
+            ->where('EstadoPolId', $request->estado_id)
+            ->where('MunicipioPolId', $request->municipio_id)
+            ->first();
+
+        if (!$municipioPol) {
+            return response()->json(['error' => 'No se encontró un municipio para el estado y municipio proporcionados'], 404);
+        }
+
+        // 2. Buscar en la tabla contracted_municipalities
+        $contractedMunicipality = DB::table('contracted_municipalities')
+            ->where('state_id', $municipioPol->EstadoPolId)
+            ->where('municipality_id', $municipioPol->MunicipioPolId)
+            ->first();
+
+        if (!$contractedMunicipality) {
+            return response()->json(['data' => [], 'message' => 'No se encontró un municipio contratado para el estado y municipio proporcionados.'], 200);
+        }
+
+        // 3. Buscar en la tabla municipality_services filtrando por service_name = 'Listar directorios'
+        $municipalityService = DB::table('municipality_services')
+            ->where('municipality_id', $contractedMunicipality->id)
+            ->where('service_name', 'Listar directorios')
+            ->first();
+
+        if (!$municipalityService) {
+            return response()->json(['error' => 'No se encontró un servicio para listar directorios en el municipio'], 404);
+        }
+
+        // 4. Concatenar la URL base del municipio con la API URL del servicio
+        $apiUrl = rtrim($contractedMunicipality->url, '/') . '/' . ltrim($municipalityService->api_url, '/');
+
+        // 5. Preparar los headers con el token
+        $headers = [
+            'Authorization' => 'Bearer ' . $contractedMunicipality->token,
+            'Content-Type' => 'application/json',
+        ];
+
+        // 6. Preparar los parámetros de la solicitud
+        $params = [
+            'estado_id' => $request->estado_id,
+            'municipio_id' => $request->municipio_id,
+        ];
+
+        // Agregar el filtro opcional de dependencia si está presente
+        if ($request->has('search_dependencia') && !empty($request->search_dependencia)) {
+            $params['search_dependencia'] = $request->search_dependencia;
+        }
+
+        try {
+            // 7. Realizar la solicitud HTTP dependiendo del método (GET o POST)
+            if (strtoupper($municipalityService->method) === 'POST') {
+                $response = Http::withHeaders($headers)->post($apiUrl, $params);
+            } else {
+                $response = Http::withHeaders($headers)->get($apiUrl, $params);
+            }
+
+            // 8. Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['data' => [], 'message' => 'No se encontraron directorios disponibles en este momento.'], 200);
+            }
+        } catch (\Exception $e) {
+            // En caso de error de conexión u otra excepción
+            Log::error("Error al intentar conectar con la API en getDirectorios: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'No se pudo establecer conexión con el servicio de directorios.'], 200);
+        }
+    }
+
+    /**
      * Obtener los términos del municipio.
      *
      * @param Request $request Contiene los parámetros 'estado_id' y 'municipio_id'.
