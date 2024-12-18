@@ -40,9 +40,24 @@ class ApiController extends Controller
      */
     public function getMunicipiosByEstado($estadoId)
     {
-        $municipios = Municipio::where('EstadoId', $estadoId)
+        // Verificar si el estado existe
+        $estado = DB::table('estado')->where('EstadoId', $estadoId)->first();
+        if (!$estado) {
+            return response()->json(['error' => 'Estado no encontrado.'], 404);
+        }
+
+        // Obtener municipios del estado especificado que no tengan ningún contrato privado
+        $municipios = DB::table('municipio')
+            ->where('EstadoId', $estadoId)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('contracted_municipalities')
+                    ->whereColumn('contracted_municipalities.municipality_id', 'municipio.MunicipioId')
+                    ->where('contracted_municipalities.is_private', true);
+            })
             ->orderBy('MunicipioNombre', 'asc')
             ->get();
+
         return response()->json($municipios);
     }
 
@@ -757,6 +772,43 @@ class ApiController extends Controller
                 ->where('municipality_id', $municipioPol->MunicipioPolId)
                 ->first();
             Log::info('Municipio contratado:', ['contracted' => $contractedMunicipality]);
+
+            // Validar si el municipio es privado
+            if ($contractedMunicipality->is_private) {
+                Log::info('Validando acceso para municipios privados...');
+
+                // Verificar que el email esté en mobile_users
+                $mobileUser = DB::table('mobile_users')
+                    ->where('email', $validated['email'])
+                    ->first();
+
+                if (!$mobileUser) {
+                    Log::error('El email no pertenece a un usuario registrado.');
+                    return response()->json([
+                        'message' => 'Access denied: The email is not associated with a registered user.',
+                        'status' => 'error'
+                    ], 403);
+                }
+
+                // Verificar que el usuario tenga una ubicación activa en mobile_user_locations
+                $userLocation = DB::table('mobile_user_locations')
+                    ->where('user_id', $mobileUser->user_id)
+                    ->where('state_id', $municipioPol->EstadoPolId)
+                    ->where('municipality_id', $municipioPol->MunicipioPolId)
+                    ->where('is_active', 1)
+                    ->first();
+
+                if (!$userLocation) {
+                    Log::error('El usuario no tiene acceso activo a esta ubicación.');
+                    return response()->json([
+                        'message' => 'Access denied: The user does not have active access to this location.',
+                        'status' => 'error'
+                    ], 403);
+                }
+            }
+
+            // Continuar con el resto del proceso para guardar el reporte
+            Log::info('Acceso validado. Continuando con el registro del reporte...');
 
             // Generar el report_id
             $generatedReportId = Str::uuid();
@@ -1580,6 +1632,55 @@ class ApiController extends Controller
                 return response()->json(['error' => 'Credenciales incorrectas'], 401);
             }
 
+            // Verificar si el usuario es privado o público
+            $location = DB::table('mobile_user_locations')
+                ->where('user_id', $user->user_id)
+                ->first();
+
+            $stateName = null;
+            $municipalityName = null;
+            $isPrivateMunicipality = false;
+            $url = 'https://www.radarciudadano.mx'; // URL pública por defecto
+
+            if ($location) {
+                if ($location->is_active) {
+                    // Si el usuario está activo, verificar el municipio
+                    $contractedMunicipality = DB::table('contracted_municipalities')
+                        ->where('state_id', $location->state_id)
+                        ->where('municipality_id', $location->municipality_id)
+                        ->first();
+
+                    if ($contractedMunicipality && $contractedMunicipality->is_private) {
+                        // Municipio y usuario son privados
+                        $isPrivateMunicipality = true;
+                        $stateName = DB::table('estado')->where('EstadoId', $location->state_id)->value('EstadoNombre');
+                        $municipalityName = DB::table('municipio')
+                            ->where('EstadoId', $location->state_id)
+                            ->where('MunicipioId', $location->municipality_id)
+                            ->value('MunicipioNombre');
+                        $url = $contractedMunicipality->url ?? 'https://www.radarciudadano.mx'; // URL del municipio contratado
+                    } else {
+                        // Municipio público, usuario se considera público
+                        $location->is_active = 0; // Considerar como público
+                    }
+                } else {
+                    // Usuario no está activo, pero conservar los datos de ubicación
+                    $stateName = DB::table('estado')->where('EstadoId', $location->state_id)->value('EstadoNombre');
+                    $municipalityName = DB::table('municipio')
+                        ->where('EstadoId', $location->state_id)
+                        ->where('MunicipioId', $location->municipality_id)
+                        ->value('MunicipioNombre');
+                }
+            } else {
+                // Usuario público sin datos de ubicación
+                $location = (object) [
+                    'user_id' => $user->user_id,
+                    'state_id' => null,
+                    'municipality_id' => null,
+                    'is_active' => null,
+                ];
+            }
+
             // Generar un token para la sesión
             $token = Str::random(60);
 
@@ -1600,6 +1701,16 @@ class ApiController extends Controller
                     'phone' => $user->phone,
                     'occupation' => $user->occupation,
                     'status' => $user->status,
+                    'is_private' => $location->is_active && $isPrivateMunicipality,
+                    'url' => $url,
+                    'location' => [
+                        'user_id' => $location->user_id,
+                        'state_id' => $location->state_id,
+                        'municipality_id' => $location->municipality_id,
+                        'is_active' => $location->is_active,
+                        'state_name' => $stateName,
+                        'municipality_name' => $municipalityName,
+                    ],
                 ],
             ]);
         } catch (\Exception $e) {
