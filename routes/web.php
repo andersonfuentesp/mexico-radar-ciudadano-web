@@ -41,7 +41,7 @@ Route::controller(WebsiteController::class)->group(function () {
     Route::post('/contact-send', 'contactoStore')->name('website.contacto.send');
 });
 
-Route::get('/download-apk', [DownloadController::class, 'downloadAPK'])->name('apk.download');
+Route::get('/download/apk', [DownloadController::class, 'downloadAPK'])->name('apk.download');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

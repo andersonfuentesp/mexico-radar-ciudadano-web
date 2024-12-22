@@ -1570,7 +1570,6 @@ class ApiController extends Controller
     public function registerUser(Request $request)
     {
         try {
-            // Validación de los datos de entrada
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
                 'email' => 'required|string|email|max:100|unique:mobile_users',
@@ -1585,17 +1584,22 @@ class ApiController extends Controller
                 'network_type' => 'nullable|string|max:20',
                 'imei' => 'nullable|string|max:20',
                 'status' => 'nullable|string|max:50|in:active,inactive',
+            ], [
+                'email.unique' => 'Este correo electrónico ya está registrado en el sistema.'
             ]);
 
-            // Encriptar la contraseña y añadir las marcas de tiempo
             $validated['password'] = bcrypt($validated['password']);
             $validated['created_at'] = now();
             $validated['updated_at'] = now();
 
-            // Creación del usuario
-            $user = DB::table('mobile_users')->insert($validated);
+            DB::table('mobile_users')->insert($validated);
 
             return response()->json(['message' => 'Usuario registrado exitosamente'], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Error al registrar usuario: ' . $e->getMessage());
             return response()->json([
