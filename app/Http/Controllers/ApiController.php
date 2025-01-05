@@ -774,7 +774,7 @@ class ApiController extends Controller
             Log::info('Municipio contratado:', ['contracted' => $contractedMunicipality]);
 
             // Validar si el municipio es privado
-            if ($contractedMunicipality->is_private) {
+            if ($contractedMunicipality && $contractedMunicipality->is_private) {
                 Log::info('Validando acceso para municipios privados...');
 
                 // Verificar que el email esté en mobile_users
@@ -1585,7 +1585,7 @@ class ApiController extends Controller
                 'imei' => 'nullable|string|max:20',
                 'status' => 'nullable|string|max:50|in:active,inactive',
             ], [
-                'email.unique' => 'Este correo electrónico ya está registrado en el sistema.'
+                'email.unique' => 'Este correo electrónico ya está registrado en el sistema.',
             ]);
 
             $validated['password'] = bcrypt($validated['password']);
@@ -1596,9 +1596,16 @@ class ApiController extends Controller
 
             return response()->json(['message' => 'Usuario registrado exitosamente'], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->errors();
+            if (isset($errors['email'])) {
+                return response()->json([
+                    'message' => 'Este correo electrónico ya está registrado en el sistema.',
+                    'field' => 'email',
+                ], 422);
+            }
             return response()->json([
                 'message' => 'Error de validación',
-                'errors' => $e->errors()
+                'errors' => $errors,
             ], 422);
         } catch (\Exception $e) {
             Log::error('Error al registrar usuario: ' . $e->getMessage());
