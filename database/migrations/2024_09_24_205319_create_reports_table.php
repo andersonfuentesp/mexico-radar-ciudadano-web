@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->char('report_id', 36)->primary();
-            $table->bigInteger('report_folio')->unique();
+            //$table->bigInteger('report_folio')->unique();
+            $table->bigInteger('report_folio');
+
             $table->date('report_registration_date')->nullable();
             $table->dateTime('report_registration_time')->nullable();
             $table->date('report_reported_date')->nullable();
@@ -31,7 +33,7 @@ return new class extends Migration
             $table->string('custom_report', 100)->nullable();
             $table->string('report_comment', 90)->nullable();
             $table->char('gps_location', 50)->nullable();
-            $table->point('geospatial_location')->nullable(); 
+            $table->point('geospatial_location')->nullable();
             $table->date('end_date')->nullable();
             $table->dateTime('end_time')->nullable();
             $table->string('end_comment', 500)->nullable();
@@ -73,6 +75,9 @@ return new class extends Migration
             $table->foreign('state_id', 'fk_reports_state')->references('EstadoId')->on('estado')->onDelete('cascade');
             $table->foreign(['state_id', 'municipality_id'], 'fk_reports_municipality')->references(['EstadoId', 'MunicipioId'])->on('municipio')->onDelete('cascade');
             // Eliminamos las claves foráneas de `report_type_id` y `report_status_id`
+
+            // Aquí agregamos la nueva restricción única compuesta
+            $table->unique(['municipality_id', 'report_folio'], 'reports_municipality_folio_unique');
         });
     }
 

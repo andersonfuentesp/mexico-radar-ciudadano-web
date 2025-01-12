@@ -726,8 +726,8 @@ class ApiController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'email' => 'nullable|string|email|max:100',
                 'gps_location' => 'nullable|string|max:50',
-                'reported_photo' => 'nullable|file|image|max:8192',
-                'end_photo' => 'nullable|file|image|max:8192',
+                'reported_photo' => 'nullable|file|image|max:10240',
+                'end_photo' => 'nullable|file|image|max:10240',
                 'attachments' => 'nullable|file|max:8192',
                 'mobile_model' => 'nullable|string|max:100',
                 'os_version' => 'nullable|string|max:50',
@@ -735,6 +735,7 @@ class ApiController extends Controller
                 'is_offline' => 'nullable|boolean',
                 'network_type' => 'nullable|string|max:20',
                 'imei' => 'nullable|string|max:20',
+                // address no está en las validaciones, pero lo tratamos más abajo
             ]);
             Log::info('Datos validados:', $validated);
 
@@ -805,6 +806,50 @@ class ApiController extends Controller
                         'status' => 'error'
                     ], 403);
                 }
+                // 2) Nuevo bloque: Si el municipio NO está contratado o está contratado pero NO es privado
+            } else {
+                Log::info('Validando acceso para municipios NO contratados o contratados sin restricción privada...');
+
+                // 1) Verificar si el usuario está registrado en mobile_users
+                $mobileUser = DB::table('mobile_users')
+                    ->where('email', $validated['email'])
+                    ->first();
+
+                if ($mobileUser) {
+                    // 2) Obtenemos TODAS las ubicaciones activas del usuario
+                    $allUserLocations = DB::table('mobile_user_locations')
+                        ->where('user_id', $mobileUser->user_id)
+                        ->where('is_active', 1)
+                        ->get();
+
+                    if ($allUserLocations->count() === 0) {
+                        // NO tiene ubicaciones en mobile_user_locations
+                        Log::info('El usuario no tiene ubicaciones activas, pero no es municipio privado; se permite continuar.');
+                    } else {
+                        // 3) Hay al menos un registro. Verificamos si alguno coincide con el municipio/estado recibidos
+                        $matchingLocation = $allUserLocations->first(function ($location) use ($municipioPol) {
+                            return $location->state_id == $municipioPol->EstadoPolId
+                                && $location->municipality_id == $municipioPol->MunicipioPolId;
+                        });
+
+                        if ($matchingLocation) {
+                            // Coincide, se puede continuar
+                            Log::info('El usuario tiene al menos una ubicación activa que coincide con este municipio (no privado).');
+                        } else {
+                            // Tiene ubicaciones, pero ninguna coincide con este municipio
+                            Log::error('El usuario tiene ubicaciones activas, pero no para este municipio.');
+                            return response()->json([
+                                'message' => 'Access denied: The user does not have active access to this location.',
+                                'status'  => 'error'
+                            ], 403);
+                        }
+                    }
+                } else {
+                    // El email no existe en mobile_users; como no es privado, no exigimos nada
+                    Log::info('El email no pertenece a un usuario registrado, pero no es municipio privado, por lo que se permite continuar.');
+                }
+
+                // OJO: De aquí en adelante, se continúa con el flujo normal...
             }
 
             // Continuar con el resto del proceso para guardar el reporte
@@ -821,12 +866,23 @@ class ApiController extends Controller
             DB::transaction(function () use ($validated, $request, $generatedReportId, $municipioPol, $contractedMunicipality, &$newFolio) {
                 Log::info('Iniciando transacción para el guardado del reporte...');
 
-                // Obtener el último folio para ese municipio y calcular el nuevo folio
-                $lastFolio = DB::table('reports')
-                    ->where('municipality_id', $municipioPol->MunicipioPolId)
-                    ->max('report_folio');
+                // Si el municipio es contratado
+                if ($contractedMunicipality) {
+                    // Obtener el último folio para ese municipio (filtro solo por municipality_id)
+                    $lastFolio = DB::table('reports')
+                        ->where('municipality_id', $municipioPol->MunicipioPolId)
+                        ->max('report_folio');
+                } else {
+                    // Si no es contratado, filtrar por BOTH municipality_id y is_contracted_municipality = 0
+                    $lastFolio = DB::table('reports')
+                        ->where('municipality_id', $municipioPol->MunicipioPolId)
+                        ->where('is_contracted_municipality', 0)
+                        ->max('report_folio');
+                }
+
+                // Calcular el folio
                 $newFolio = $lastFolio ? $lastFolio + 1 : 1;
-                Log::info('Folio de reporte calculado (agrupado por municipio):', ['folio' => $newFolio]);
+                Log::info('Folio de reporte calculado:', ['folio' => $newFolio]);
 
                 // Guardar imágenes si están presentes
                 $reportedPhotoPath = $request->hasFile('reported_photo')
@@ -857,7 +913,8 @@ class ApiController extends Controller
                     'report_status_id' => 'Reportado',
                     'report_address' => $validated['address'],
                     'custom_report' => $validated['report_type'],
-                    'report_comment' => $validated['comment'],
+                    // Forzamos comment a "-" si viene vacío o null
+                    'report_comment' => empty($validated['comment']) ? '-' : $validated['comment'],
                     'gps_location' => $validated['gps_location'],
                     'geospatial_location' => DB::raw("ST_GeomFromText('POINT({$validated['longitude']} {$validated['latitude']})', 4326)"),
                     'email' => $validated['email'],
@@ -907,27 +964,29 @@ class ApiController extends Controller
                 ];
                 Log::info('Encabezados de la solicitud:', $headers);
 
-                // Mostrar datos que se enviarán en la solicitud
+                // Construimos los datos asegurando que comment y address no sean null
                 $data = [
-                    'report_id' => $generatedReportId,
-                    'latitude' => $validated['latitude'],
-                    'longitude' => $validated['longitude'],
-                    'state' => $municipioPol->EstadoPolId,
+                    'report_id'   => $generatedReportId,
+                    'latitude'    => $validated['latitude'],
+                    'longitude'   => $validated['longitude'],
+                    'state'       => $municipioPol->EstadoPolId,
                     'municipality' => $municipioPol->MunicipioPolId,
                     'report_type' => $validated['report_type'],
-                    'address' => $validated['address'],
-                    'comment' => $validated['comment'],
-                    'phone' => $validated['phone'],
-                    'email' => $validated['email'],
+                    // Forzamos address a "-" si viene vacío o null
+                    'address'     => empty($validated['address']) ? '-' : $validated['address'],
+                    // Forzamos comment a "-" si viene vacío o null
+                    'comment'     => empty($validated['comment']) ? '-' : $validated['comment'],
+                    'phone'       => $validated['phone'],
+                    'email'       => $validated['email'],
                     'gps_location' => $validated['gps_location'],
-                    'folio' => $newFolio
+                    'folio'       => $newFolio
                 ];
                 Log::info('Datos enviados en la solicitud:', $data);
 
                 // Iniciar la solicitud con los datos básicos y los encabezados
                 $response = Http::asMultipart()->withHeaders($headers);
 
-                // Adjunta archivos
+                // Adjuntamos archivos si existen
                 if ($request->hasFile('reported_photo')) {
                     $response = $response->attach(
                         'reported_photo',
@@ -959,14 +1018,17 @@ class ApiController extends Controller
                     Log::info('Solicitud HTTP POST exitosa. Respuesta recibida:', $response->json());
                     return response()->json([
                         'message' => 'Report successfully submitted',
-                        'data' => $response->json(),
+                        'data'    => $response->json(),
                     ], 200);
                 } else {
                     // Log adicional para el error con detalles de la respuesta recibida
-                    Log::error('Error en la solicitud HTTP POST. Respuesta no exitosa:', ['status' => $response->status(), 'body' => $response->body()]);
+                    Log::error('Error en la solicitud HTTP POST. Respuesta no exitosa:', [
+                        'status' => $response->status(),
+                        'body'   => $response->body()
+                    ]);
                     return response()->json([
                         'message' => 'Failed to submit the report. Check the service URL or configuration.',
-                        'status' => 'error'
+                        'status'  => 'error'
                     ], 200);
                 }
             }
@@ -977,8 +1039,8 @@ class ApiController extends Controller
             Log::error('Error en saveReport: ' . $e->getMessage());
             return response()->json([
                 'message' => 'There was an error while saving the report',
-                'status' => 'error',
-                'error' => $e->getMessage()
+                'status'  => 'error',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
@@ -1431,6 +1493,7 @@ class ApiController extends Controller
                 'created_at',
                 'updated_at'
             )
+            ->orderBy('created_at', 'desc') // Agregar orden descendente por la fecha de creación
             ->get();
 
         // Retornar la respuesta con los reportes filtrados
