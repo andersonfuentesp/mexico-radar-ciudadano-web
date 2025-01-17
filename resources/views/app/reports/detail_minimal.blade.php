@@ -24,15 +24,133 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title"><i class="fas fa-info-circle"></i> Detalle del Reporte</h3>
             <div>
-                <a href="{{ route('admin.reports.all') }}" class="btn btn-secondary mr-2"><i class="fas fa-arrow-left"></i>
-                    Regresar</a>
-                <button class="btn btn-custom" onclick="window.print()"><i class="fas fa-download"></i> Descargar
-                    Reporte</button>
+                <a href="{{ route('admin.reports.all') }}" class="btn btn-secondary mr-2">
+                    <i class="fas fa-arrow-left"></i> Regresar
+                </a>
+                <button class="btn btn-custom" onclick="window.print()">
+                    <i class="fas fa-download"></i> Descargar Reporte
+                </button>
             </div>
         </div>
 
         <div class="card-body">
             @if ($mobileReport)
+                <!-- Información del Reporte Móvil -->
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">Información del Reporte Móvil</h5>
+                    </div>
+                    <div class="card-body">
+                        @if ($mobileReport)
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>ID de Usuario de Atención:</strong></h6>
+                                        <p>{{ $mobileReport->attention_user_id ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Nick de Usuario de Atención:</strong></h6>
+                                        <p>{{ $mobileReport->attention_user_nick ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>ID GAM de Usuario de Atención:</strong></h6>
+                                        <p>{{ $mobileReport->attention_user_id_gam ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Reporte Bloqueado:</strong></h6>
+                                        <p>{{ $mobileReport->blocked_report ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Fecha de Bloqueo:</strong></h6>
+                                        <p>{{ $mobileReport->block_date ? \Carbon\Carbon::parse($mobileReport->block_date)->format('d-m-Y H:i:s') : 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Usuario que Bloqueó:</strong></h6>
+                                        <p>{{ $mobileReport->block_user ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Correo Electrónico:</strong></h6>
+                                        <p>{{ $mobileReport->email ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Teléfono:</strong></h6>
+                                        <p>{{ $mobileReport->phone ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Estado SD:</strong></h6>
+                                        <p>{{ $mobileReport->status_sd ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Estado Lista SD:</strong></h6>
+                                        <p>{{ $mobileReport->status_list_sd ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Modelo del Dispositivo:</strong></h6>
+                                        <p>{{ $mobileReport->mobile_model ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Versión del SO:</strong></h6>
+                                        <p>{{ $mobileReport->os_version ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Versión de la App:</strong></h6>
+                                        <p>{{ $mobileReport->app_version ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>Red al Enviar:</strong></h6>
+                                        <p>{{ $mobileReport->network_type ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-2 border rounded">
+                                        <h6><strong>IMEI:</strong></h6>
+                                        <p>{{ $mobileReport->imei ?? 'No disponible' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-warning">
+                                Sin datos disponibles para móvil.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <!-- Información General -->
                 <div class="card mb-4">
                     <div class="card-header bg-custom text-white">
@@ -104,8 +222,7 @@
                             <div class="col-md-4 mb-3">
                                 <div class="p-2 border rounded">
                                     <h6><strong>Fecha de Bloqueo:</strong></h6>
-                                    <p>{{ $mobileReport->block_date ? \Carbon\Carbon::parse($mobileReport->block_date)->format('d-m-Y H:i:s') : 'No disponible' }}
-                                    </p>
+                                    <p>{{ $mobileReport->block_date ? \Carbon\Carbon::parse($mobileReport->block_date)->format('d-m-Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                             </div>
                         </div>
