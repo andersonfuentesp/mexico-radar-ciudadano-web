@@ -202,7 +202,7 @@
             </table>
 
             <div class="d-flex justify-content-center">
-                {{ $reports->appends(request()->query())->links() }}
+                {{ $reports->appends(request()->query())->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>

@@ -885,11 +885,22 @@ class ApiController extends Controller
                 Log::info('Folio de reporte calculado:', ['folio' => $newFolio]);
 
                 // Guardar imágenes si están presentes
+                // Guardar imágenes si están presentes con dimensiones específicas
                 $reportedPhotoPath = $request->hasFile('reported_photo')
-                    ? ImageHelper::storeImage($request->file('reported_photo'), 'reports')
+                    ? ImageHelper::storeImageWithDimensions(
+                        $request->file('reported_photo'),
+                        'reports',
+                        739,
+                        1600 // Dimensiones verticales
+                    )
                     : null;
                 $endPhotoPath = $request->hasFile('end_photo')
-                    ? ImageHelper::storeImage($request->file('end_photo'), 'reports')
+                    ? ImageHelper::storeImageWithDimensions(
+                        $request->file('end_photo'),
+                        'reports',
+                        739,
+                        1600 // Dimensiones verticales
+                    )
                     : null;
                 $attachmentData = $request->hasFile('attachments')
                     ? ImageHelper::storeFile($request->file('attachments'), 'reports')

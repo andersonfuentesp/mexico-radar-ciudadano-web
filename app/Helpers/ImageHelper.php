@@ -35,6 +35,44 @@ class ImageHelper
         return url('uploads/' . $folder . '/' . $filename);
     }
 
+    public static function storeImageWithDimensions($image, $folder, $verticalWidth = 739, $verticalHeight = 1600)
+    {
+        $filename = self::sanitizeFileName(now()->format('Ymd_His') . '_' . $image->getClientOriginalName());
+        $path = public_path('uploads/' . $folder);
+
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        // Cargar la imagen usando Intervention Image
+        $img = Image::make($image);
+
+        // Ajustar la orientación según los metadatos EXIF
+        $img->orientate();
+
+        // Determinar dimensiones según orientación
+        if ($img->width() > $img->height()) {
+            // Imagen horizontal
+            $width = $verticalHeight; // 1600
+            $height = $verticalWidth; // 739
+        } else {
+            // Imagen vertical
+            $width = $verticalWidth;  // 739
+            $height = $verticalHeight; // 1600
+        }
+
+        // Redimensionar la imagen según las dimensiones calculadas
+        $img->fit($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+
+        // Guardar la imagen redimensionada
+        $img->save($path . '/' . $filename);
+
+        return url('uploads/' . $folder . '/' . $filename);
+    }
+
     public static function storeFile($pdf, $folder)
     {
         $originalName = $pdf->getClientOriginalName();
